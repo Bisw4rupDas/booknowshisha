@@ -18,6 +18,8 @@ import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 
+import { SmsService } from '../notifications/sms.service';
+
 export interface GoogleUserProfile {
   googleId: string;
   email: string;
@@ -36,7 +38,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly redisService: RedisService,
+    private readonly smsService: SmsService,
   ) {}
+
 
   // ===========================================================================
   // 1. STANDARD USER AUTHENTICATION
@@ -570,14 +574,15 @@ export class AuthService {
     const phone = this.cleanIndianPhone(dto.phone);
     const redis = this.redisService.getClient();
 
-    // 1. Check Cooldown (30 seconds)
+    // 1. Check Cooldown (45 seconds)
     const cooldownKey = `bns:otp:cd:${phone}`;
     const inCooldown = await redis.get(cooldownKey);
     if (inCooldown) {
-      throw new BadRequestException('Please wait 30 seconds before requesting another OTP.');
+      const ttl = await redis.ttl(cooldownKey);
+      throw new BadRequestException(`Please wait ${ttl > 0 ? ttl : 45} seconds before requesting another OTP.`);
     }
 
-    // 2. Check Rate Limit (5 per 15 minutes)
+    // 2. Check Rate Limit (5 requests per 15 minutes)
     const rateKey = `bns:otp:rate:${phone}`;
     const requestCount = parseInt((await redis.get(rateKey)) || '0', 10);
     if (requestCount >= 5) {
@@ -585,15 +590,23 @@ export class AuthService {
     }
 
     // 3. Generate Cryptographically Secure 6-digit OTP
-    let otp = crypto.randomInt(100000, 999999).toString();
-    if (process.env.NODE_ENV !== 'production' && phone === '9830012345') {
-      otp = '123456';
+    const otp = crypto.randomInt(100000, 1000000).toString();
+
+    // 4. Dispatch Real SMS via SMS Gateway Provider
+    const smsResult = await this.smsService.sendOtpSms(phone, otp);
+    if (!smsResult.success) {
+      this.logger.error(
+        `[AuthService] SMS delivery failed for +91 ${phone.substring(0, 5)} •••${phone.substring(8)}: ${smsResult.error}`,
+      );
+      throw new BadRequestException(
+        smsResult.error || 'We could not send the OTP right now. Please verify SMS provider configuration or try again.',
+      );
     }
 
+    // 5. Store OTP Hash in Redis with 5-minute (300s) TTL ONLY after successful gateway dispatch
     const otpHash = await bcrypt.hash(otp, 10);
     const otpKey = `bns:otp:${phone}`;
 
-    // 4. Save in Redis with 5-minute (300s) TTL
     const otpPayload = JSON.stringify({
       hash: otpHash,
       attempts: 0,
@@ -602,19 +615,17 @@ export class AuthService {
     });
 
     await redis.set(otpKey, otpPayload, 'EX', 300);
-    await redis.set(cooldownKey, '1', 'EX', 30);
-    await redis.set(rateKey, (requestCount + 1).toString(), 'EX', 900);
-
-    this.logger.log(`[BookMySmoke Backend OTP] Generated 6-digit code for +91 ${phone}: ${otp}`);
+    await redis.set(cooldownKey, '1', 'EX', 45); // 45 seconds cooldown
+    await redis.set(rateKey, (requestCount + 1).toString(), 'EX', 900); // 15 minutes
 
     const maskedPhone = `+91 ${phone.substring(0, 5)} •••${phone.substring(8)}`;
 
     return {
       success: true,
-      message: `6-digit verification code sent to ${maskedPhone}`,
+      message: `OTP sent successfully to ${maskedPhone}`,
       maskedPhone,
       phone,
-      cooldownSeconds: 30,
+      cooldownSeconds: 45,
       expiresInSeconds: 300,
     };
   }
@@ -624,7 +635,7 @@ export class AuthService {
     const otp = dto.otp.trim().replace(/[^0-9]/g, '');
 
     if (otp.length !== 6) {
-      throw new BadRequestException('Please provide a valid 6-digit OTP code.');
+      throw new BadRequestException('Please enter a valid 6-digit OTP code.');
     }
 
     const redis = this.redisService.getClient();
@@ -632,7 +643,7 @@ export class AuthService {
     const rawData = await redis.get(otpKey);
 
     if (!rawData) {
-      throw new BadRequestException('OTP has expired or is invalid. Please request a new OTP.');
+      throw new BadRequestException('This OTP has expired. Please request a new one.');
     }
 
     let otpData: { hash: string; attempts: number; phone: string; createdAt: number };
@@ -657,10 +668,10 @@ export class AuthService {
         await redis.set(otpKey, JSON.stringify(otpData), 'EX', ttl);
       }
       const remaining = 5 - otpData.attempts;
-      throw new BadRequestException(`Incorrect OTP code. ${remaining} attempts remaining.`);
+      throw new BadRequestException(`Incorrect OTP. ${remaining} attempts remaining. Please try again.`);
     }
 
-    // Valid OTP: delete key
+    // Valid OTP: delete key immediately to prevent replay attacks
     await redis.del(otpKey);
 
     // Find or create customer in PostgreSQL
@@ -713,7 +724,7 @@ export class AuthService {
 
     return {
       success: true,
-      message: isNewUser ? 'Account created and signed in successfully!' : 'Signed in successfully!',
+      message: 'Mobile number verified successfully.',
       accessToken,
       isNewUser,
       user: {
@@ -735,7 +746,4 @@ export class AuthService {
   }
 }
 
-function disaster(msg: string) {
-  return new UnauthorizedException(msg);
-}
 

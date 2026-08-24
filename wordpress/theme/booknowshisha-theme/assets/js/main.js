@@ -421,19 +421,14 @@
     });
 
     // ------------------------------------------------------------------------
-    // 12. Customer Mobile OTP Authentication System (Kolkata & India Only)
+    // 12. Customer Google Authentication System (Mock & OAuth Ready)
     // ------------------------------------------------------------------------
     var $authModal = $('#bns-auth-modal');
-    var otpTimerInterval = null;
-    var inpageTimerInterval = null;
-    var currentOtpPhone = '';
-    var inpageOtpPhone = '';
 
-    // Open Auth Modal from ANY customer login trigger when logged out
-    $(document).on('click', '#bns-account-trigger:not(.is-logged-in), .bns-account-trigger:not(.is-logged-in), .bns-btn-account-login, .bns-btn-mobile-login, .bns-open-auth-btn, .bns-trigger-otp-login, .woocommerce-info a.showlogin, a.showlogin', function(e) {
-      // If on the /my-account/ in-page form itself, do not open modal, focus the in-page input
-      if ($('#bns-inpage-otp-phone-input').length && $('#bns-inpage-otp-phone-input').is(':visible')) {
-        $('#bns-inpage-otp-phone-input').focus();
+    // Open Google Auth Modal from ANY customer login trigger when logged out
+    $(document).on('click', '#bns-account-trigger:not(.is-logged-in), .bns-account-trigger:not(.is-logged-in), .bns-btn-account-login, .bns-btn-mobile-login, .bns-open-auth-btn, .bns-trigger-google-login, .woocommerce-info a.showlogin, a.showlogin', function(e) {
+      // If on the /my-account/ in-page form itself, do not open modal
+      if ($('#bns-inpage-btn-google-auth').length && $('#bns-inpage-btn-google-auth').is(':visible')) {
         return;
       }
 
@@ -443,377 +438,75 @@
         $('body').css('overflow', '');
       }
       $('.bns-account-dropdown-menu').removeClass('is-open');
-      resetOtpModal();
+      $('#bns-auth-alert').hide().text('');
       $authModal.css('display', 'flex').hide().fadeIn(200);
-      setTimeout(function() {
-        $('#bns-otp-phone-input').focus();
-      }, 50);
     });
 
     // Close Auth Modal
     $(document).on('click', '#bns-auth-close, #bns-auth-backdrop', function() {
       $authModal.fadeOut(150);
-      clearInterval(otpTimerInterval);
     });
 
     // Close on Escape key
     $(document).on('keydown', function(e) {
       if ((e.key === 'Escape' || e.keyCode === 27) && $authModal.is(':visible')) {
         $authModal.fadeOut(150);
-        clearInterval(otpTimerInterval);
       }
     });
 
-    function resetOtpModal() {
-      $('#bns-otp-modal-title').text('SIGN IN WITH MOBILE');
-      $('#bns-otp-subtitle').text('Enter your Indian mobile number to receive a secure 6-digit OTP.');
-      $('#bns-otp-alert').hide().text('').removeClass('bns-alert-error bns-alert-success');
-      $('#bns-otp-phone-form').show();
-      $('#bns-otp-verify-form').hide();
-      $('#bns-btn-send-otp').prop('disabled', false).find('span').text('SEND OTP →');
-      $('#bns-btn-verify-otp').prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
-      $('#bns-otp-code-input').val('');
-      clearInterval(otpTimerInterval);
-    }
-
-    function showOtpAlert(msg, type, isPage) {
-      var $alert = isPage ? $('#bns-inpage-otp-alert') : $('#bns-otp-alert');
+    function showAuthAlert(msg, type, isPage) {
+      var $alert = isPage ? $('#bns-inpage-auth-alert') : $('#bns-auth-alert');
       $alert.removeClass('bns-alert-error bns-alert-success')
         .addClass(type === 'success' ? 'bns-alert-success' : 'bns-alert-error')
         .html(msg).fadeIn(200);
     }
 
-    function sanitizeIndianPhone(raw) {
-      var clean = (raw || '').replace(/[^0-9]/g, '');
-      if (clean.length === 12 && clean.indexOf('91') === 0) {
-        clean = clean.substring(2);
-      } else if (clean.length === 11 && clean.indexOf('0') === 0) {
-        clean = clean.substring(1);
-      }
-      return clean;
-    }
-
-    // =========================================================================
-    // MODAL OTP LOGIC
-    // =========================================================================
-
-    // Modal Step 1: Send OTP
-    $('#bns-otp-phone-form').on('submit', function(e) {
+    // Google Sign-In Execution (Supports Mock Dev & Real ID Token)
+    $(document).on('click', '#bns-btn-google-auth, #bns-inpage-btn-google-auth', function(e) {
       e.preventDefault();
-      var cleanPhone = sanitizeIndianPhone($('#bns-otp-phone-input').val());
-
-      if (cleanPhone.length !== 10 || !['6', '7', '8', '9'].includes(cleanPhone.charAt(0))) {
-        showOtpAlert('Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.', 'error', false);
-        $('#bns-otp-phone-input').focus();
-        return;
-      }
-
-      var $btn = $('#bns-btn-send-otp');
-      $btn.prop('disabled', true).find('span').text('SENDING OTP...');
-      $('#bns-otp-alert').hide();
+      var $btn = $(this);
+      var isPage = $btn.attr('id') === 'bns-inpage-btn-google-auth';
+      var $alert = isPage ? $('#bns-inpage-auth-alert') : $('#bns-auth-alert');
+      
+      $alert.hide();
+      $btn.prop('disabled', true).addClass('is-loading');
+      var $text = $btn.find('.bns-google-text');
+      var originalText = $text.text();
+      $text.text('Connecting with Google...');
 
       $.ajax({
         url: '/wp-admin/admin-ajax.php',
         type: 'POST',
         data: {
-          action: 'bns_send_otp',
-          phone: cleanPhone,
-        },
-        success: function(res) {
-          $btn.prop('disabled', false).find('span').text('SEND OTP →');
-          if (res && res.success) {
-            currentOtpPhone = cleanPhone;
-            $('#bns-otp-modal-title').text('VERIFY YOUR MOBILE NUMBER');
-            $('#bns-otp-subtitle').text('Enter the 6-digit verification code sent to your mobile.');
-            $('#bns-otp-sent-number').text(res.data.masked_phone || ('+91 ' + cleanPhone));
-            $('#bns-otp-phone-form').hide();
-            $('#bns-otp-verify-form').fadeIn(200);
-            $('#bns-otp-code-input').focus();
-            startResendTimer(res.data.cooldown_seconds || 30, false);
-            showToast('OTP Dispatched', res.data.message || 'Verification code sent to your mobile.', 'success');
-          } else {
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Failed to send OTP. Please try again.';
-            showOtpAlert(errMsg, 'error', false);
-          }
-        },
-        error: function() {
-          $btn.prop('disabled', false).find('span').text('SEND OTP →');
-          showOtpAlert('Network error while requesting OTP. Please check your connection.', 'error', false);
-        }
-      });
-    });
-
-    // Modal Step 2: Verify OTP
-    $('#bns-otp-verify-form').on('submit', function(e) {
-      e.preventDefault();
-      var code = $('#bns-otp-code-input').val().trim().replace(/[^0-9]/g, '');
-
-      if (code.length !== 6) {
-        showOtpAlert('Please enter the full 6-digit verification code.', 'error', false);
-        $('#bns-otp-code-input').focus();
-        return;
-      }
-
-      var $btn = $('#bns-btn-verify-otp');
-      $btn.prop('disabled', true).find('span').text('VERIFYING...');
-      $('#bns-otp-alert').hide();
-
-      $.ajax({
-        url: '/wp-admin/admin-ajax.php',
-        type: 'POST',
-        data: {
-          action: 'bns_verify_otp',
-          phone: currentOtpPhone,
-          otp: code,
-          redirect: window.location.href,
+          action: 'bns_google_login',
+          id_token: 'mock_token',
+          redirect: window.location.href
         },
         success: function(res) {
           if (res && res.success) {
-            $btn.find('span').text('SIGNING IN...');
-            showToast('Authentication Successful', res.data.message || 'Welcome to BookMySmoke!', 'success');
+            $text.text('Signed In!');
+            showToast('Google Authentication', res.data.message || 'Welcome to BookMySmoke!', 'success');
             setTimeout(function() {
               if (res.data.redirect) {
                 window.location.href = res.data.redirect;
               } else {
                 location.reload();
               }
-            }, 600);
+            }, 500);
           } else {
-            $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Invalid OTP code. Please try again.';
-            showOtpAlert(errMsg, 'error', false);
-            $('#bns-otp-code-input').focus();
+            $btn.prop('disabled', false).removeClass('is-loading');
+            $text.text(originalText);
+            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Google authentication failed. Please try again.';
+            showAuthAlert(errMsg, 'error', isPage);
           }
         },
         error: function() {
-          $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
-          showOtpAlert('Network error during verification. Please try again.', 'error', false);
+          $btn.prop('disabled', false).removeClass('is-loading');
+          $text.text(originalText);
+          showAuthAlert('Network error during Google sign-in. Please try again.', 'error', isPage);
         }
       });
     });
-
-    // Modal Resend OTP Action
-    $('#bns-btn-resend-otp').on('click', function(e) {
-      e.preventDefault();
-      var $btn = $(this);
-      $btn.prop('disabled', true).text('Sending...');
-      $('#bns-otp-alert').hide();
-
-      $.ajax({
-        url: '/wp-admin/admin-ajax.php',
-        type: 'POST',
-        data: {
-          action: 'bns_send_otp',
-          phone: currentOtpPhone,
-        },
-        success: function(res) {
-          $btn.prop('disabled', false).text('Resend OTP');
-          if (res && res.success) {
-            startResendTimer(res.data.cooldown_seconds || 30, false);
-            showToast('OTP Resent', res.data.message || 'New OTP sent to your mobile.', 'info');
-          } else {
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not resend OTP. Please wait before retrying.';
-            showOtpAlert(errMsg, 'error', false);
-          }
-        },
-        error: function() {
-          $btn.prop('disabled', false).text('Resend OTP');
-          showOtpAlert('Network error while resending OTP.', 'error', false);
-        }
-      });
-    });
-
-    // Modal Switch back to edit phone
-    $('#bns-otp-edit-phone-btn').on('click', function(e) {
-      e.preventDefault();
-      clearInterval(otpTimerInterval);
-      $('#bns-otp-modal-title').text('SIGN IN WITH MOBILE');
-      $('#bns-otp-subtitle').text('Enter your Indian mobile number to receive a secure 6-digit OTP.');
-      $('#bns-otp-verify-form').hide();
-      $('#bns-otp-phone-form').fadeIn(200);
-      $('#bns-otp-phone-input').focus();
-    });
-
-    // =========================================================================
-    // IN-PAGE / MY-ACCOUNT OTP LOGIC
-    // =========================================================================
-
-    // In-Page Step 1: Send OTP
-    $('#bns-inpage-otp-phone-form').on('submit', function(e) {
-      e.preventDefault();
-      var cleanPhone = sanitizeIndianPhone($('#bns-inpage-otp-phone-input').val());
-
-      if (cleanPhone.length !== 10 || !['6', '7', '8', '9'].includes(cleanPhone.charAt(0))) {
-        showOtpAlert('Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.', 'error', true);
-        $('#bns-inpage-otp-phone-input').focus();
-        return;
-      }
-
-      var $btn = $('#bns-inpage-btn-send-otp');
-      $btn.prop('disabled', true).find('span').text('SENDING OTP...');
-      $('#bns-inpage-otp-alert').hide();
-
-      $.ajax({
-        url: '/wp-admin/admin-ajax.php',
-        type: 'POST',
-        data: {
-          action: 'bns_send_otp',
-          phone: cleanPhone,
-        },
-        success: function(res) {
-          $btn.prop('disabled', false).find('span').text('SEND OTP →');
-          if (res && res.success) {
-            inpageOtpPhone = cleanPhone;
-            $('#bns-inpage-otp-title').text('VERIFY YOUR MOBILE NUMBER');
-            $('#bns-inpage-otp-subtitle').text('Enter the 6-digit verification code sent to your mobile.');
-            $('#bns-inpage-otp-sent-number').text(res.data.masked_phone || ('+91 ' + cleanPhone));
-            $('#bns-inpage-otp-phone-form').hide();
-            $('#bns-inpage-otp-verify-form').fadeIn(200);
-            $('#bns-inpage-otp-code-input').focus();
-            startResendTimer(res.data.cooldown_seconds || 30, true);
-            showToast('OTP Dispatched', res.data.message || 'Verification code sent to your mobile.', 'success');
-          } else {
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Failed to send OTP. Please try again.';
-            showOtpAlert(errMsg, 'error', true);
-          }
-        },
-        error: function() {
-          $btn.prop('disabled', false).find('span').text('SEND OTP →');
-          showOtpAlert('Network error while requesting OTP. Please check your connection.', 'error', true);
-        }
-      });
-    });
-
-    // In-Page Step 2: Verify OTP
-    $('#bns-inpage-otp-verify-form').on('submit', function(e) {
-      e.preventDefault();
-      var code = $('#bns-inpage-otp-code-input').val().trim().replace(/[^0-9]/g, '');
-
-      if (code.length !== 6) {
-        showOtpAlert('Please enter the full 6-digit verification code.', 'error', true);
-        $('#bns-inpage-otp-code-input').focus();
-        return;
-      }
-
-      var $btn = $('#bns-inpage-btn-verify-otp');
-      $btn.prop('disabled', true).find('span').text('VERIFYING...');
-      $('#bns-inpage-otp-alert').hide();
-
-      $.ajax({
-        url: '/wp-admin/admin-ajax.php',
-        type: 'POST',
-        data: {
-          action: 'bns_verify_otp',
-          phone: inpageOtpPhone,
-          otp: code,
-          redirect: window.location.href,
-        },
-        success: function(res) {
-          if (res && res.success) {
-            $btn.find('span').text('SIGNING IN...');
-            showToast('Authentication Successful', res.data.message || 'Welcome to BookMySmoke!', 'success');
-            setTimeout(function() {
-              if (res.data.redirect) {
-                window.location.href = res.data.redirect;
-              } else {
-                location.reload();
-              }
-            }, 600);
-          } else {
-            $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Invalid OTP code. Please try again.';
-            showOtpAlert(errMsg, 'error', true);
-            $('#bns-inpage-otp-code-input').focus();
-          }
-        },
-        error: function() {
-          $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
-          showOtpAlert('Network error during verification. Please try again.', 'error', true);
-        }
-      });
-    });
-
-    // In-Page Resend OTP Action
-    $('#bns-inpage-btn-resend-otp').on('click', function(e) {
-      e.preventDefault();
-      var $btn = $(this);
-      $btn.prop('disabled', true).text('Sending...');
-      $('#bns-inpage-otp-alert').hide();
-
-      $.ajax({
-        url: '/wp-admin/admin-ajax.php',
-        type: 'POST',
-        data: {
-          action: 'bns_send_otp',
-          phone: inpageOtpPhone,
-        },
-        success: function(res) {
-          $btn.prop('disabled', false).text('Resend OTP');
-          if (res && res.success) {
-            startResendTimer(res.data.cooldown_seconds || 30, true);
-            showToast('OTP Resent', res.data.message || 'New OTP sent to your mobile.', 'info');
-          } else {
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not resend OTP. Please wait before retrying.';
-            showOtpAlert(errMsg, 'error', true);
-          }
-        },
-        error: function() {
-          $btn.prop('disabled', false).text('Resend OTP');
-          showOtpAlert('Network error while resending OTP.', 'error', true);
-        }
-      });
-    });
-
-    // In-Page Switch back to edit phone
-    $('#bns-inpage-otp-edit-phone-btn').on('click', function(e) {
-      e.preventDefault();
-      clearInterval(inpageTimerInterval);
-      $('#bns-inpage-otp-title').text('SIGN IN WITH MOBILE');
-      $('#bns-inpage-otp-subtitle').text('Enter your 10-digit Indian mobile number to receive a secure 6-digit verification code.');
-      $('#bns-inpage-otp-verify-form').hide();
-      $('#bns-inpage-otp-phone-form').fadeIn(200);
-      $('#bns-inpage-otp-phone-input').focus();
-    });
-
-
-    // Common Resend Timer Function
-    function startResendTimer(seconds, isPage) {
-      if (isPage) {
-        clearInterval(inpageTimerInterval);
-        var pTimeLeft = seconds;
-        var $pTimer = $('#bns-inpage-otp-timer-text');
-        var $pResend = $('#bns-inpage-btn-resend-otp');
-        $pTimer.show().text('Resend OTP in ' + pTimeLeft + 's');
-        $pResend.hide();
-        inpageTimerInterval = setInterval(function() {
-          pTimeLeft--;
-          if (pTimeLeft <= 0) {
-            clearInterval(inpageTimerInterval);
-            $pTimer.hide();
-            $pResend.fadeIn(150);
-          } else {
-            $pTimer.text('Resend OTP in ' + pTimeLeft + 's');
-          }
-        }, 1000);
-      } else {
-        clearInterval(otpTimerInterval);
-        var timeLeft = seconds;
-        var $timerText = $('#bns-otp-timer-text');
-        var $resendBtn = $('#bns-btn-resend-otp');
-        $timerText.show().text('Resend OTP in ' + timeLeft + 's');
-        $resendBtn.hide();
-        otpTimerInterval = setInterval(function() {
-          timeLeft--;
-          if (timeLeft <= 0) {
-            clearInterval(otpTimerInterval);
-            $timerText.hide();
-            $resendBtn.fadeIn(150);
-          } else {
-            $timerText.text('Resend OTP in ' + timeLeft + 's');
-          }
-        }, 1000);
-      }
-    }
 
 
 

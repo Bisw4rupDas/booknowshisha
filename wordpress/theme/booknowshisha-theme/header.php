@@ -141,7 +141,7 @@
                     ?>
                     <!-- Account Dropdown Component -->
                     <div class="bns-account-dropdown-wrapper">
-                        <a href="<?php echo esc_url($account_url); ?>" class="bns-action-icon bns-account-trigger <?php echo $is_logged_in ? 'is-logged-in' : 'bns-trigger-otp-login'; ?>" data-logged-in="<?php echo $is_logged_in ? '1' : '0'; ?>" title="<?php echo $is_logged_in ? esc_attr(sprintf(__('My Account (%s)', 'shisharent'), $user_name)) : esc_attr__('Sign In with Mobile OTP', 'shisharent'); ?>" aria-label="<?php esc_attr_e('My Account', 'shisharent'); ?>" aria-haspopup="true" aria-expanded="false" id="bns-account-trigger">
+                        <a href="<?php echo esc_url($account_url); ?>" class="bns-action-icon bns-account-trigger <?php echo $is_logged_in ? 'is-logged-in' : 'bns-trigger-google-login'; ?>" data-logged-in="<?php echo $is_logged_in ? '1' : '0'; ?>" title="<?php echo $is_logged_in ? esc_attr(sprintf(__('My Account (%s)', 'shisharent'), $user_name)) : esc_attr__('Sign In with Google', 'shisharent'); ?>" aria-label="<?php esc_attr_e('My Account', 'shisharent'); ?>" aria-haspopup="true" aria-expanded="false" id="bns-account-trigger">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
@@ -197,10 +197,10 @@
                                 <?php else: ?>
                                     <div class="bns-account-guest-header">
                                         <span class="bns-guest-badge"><?php esc_html_e('BOOKMYSMOKE ACCOUNT', 'shisharent'); ?></span>
-                                        <h4 class="bns-guest-title"><?php esc_html_e('Sign In with Mobile OTP', 'shisharent'); ?></h4>
-                                        <p class="bns-guest-desc"><?php esc_html_e('Access your active hookah reservations, saved Kolkata addresses & fast OTP checkout.', 'shisharent'); ?></p>
-                                        <a href="#" class="button bns-btn-account-login bns-trigger-otp-login">
-                                            <?php esc_html_e('SIGN IN WITH MOBILE OTP →', 'shisharent'); ?>
+                                        <h4 class="bns-guest-title"><?php esc_html_e('Sign In with Google', 'shisharent'); ?></h4>
+                                        <p class="bns-guest-desc"><?php esc_html_e('Access your active hookah reservations, saved Kolkata addresses & fast Google sign-in.', 'shisharent'); ?></p>
+                                        <a href="#" class="button bns-btn-account-login bns-trigger-google-login">
+                                            <?php esc_html_e('SIGN IN WITH GOOGLE →', 'shisharent'); ?>
                                         </a>
                                     </div>
                                     <div class="bns-account-guest-links">
@@ -309,10 +309,10 @@
                             <div class="bns-mobile-guest-text">
                                 <span class="bns-mobile-guest-tag"><?php esc_html_e('BOOKMYSMOKE VIP', 'shisharent'); ?></span>
                                 <strong><?php esc_html_e('Account & Reservations', 'shisharent'); ?></strong>
-                                <p><?php esc_html_e('Sign in to track active rentals & saved addresses.', 'shisharent'); ?></p>
+                                <p><?php esc_html_e('Sign in with Google to track active rentals & saved addresses.', 'shisharent'); ?></p>
                             </div>
-                            <a href="#" class="bns-btn-mobile-login bns-trigger-otp-login">
-                                <?php esc_html_e('SIGN IN WITH MOBILE OTP →', 'shisharent'); ?>
+                            <a href="#" class="bns-btn-mobile-login bns-trigger-google-login">
+                                <?php esc_html_e('SIGN IN WITH GOOGLE →', 'shisharent'); ?>
                             </a>
                         </div>
                     <?php endif; ?>

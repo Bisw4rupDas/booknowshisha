@@ -67,11 +67,27 @@ class Hookah_Checkout_Fields {
     }
 
     public function validate_rental_checkout_fields() {
+        // 1. Mandatory 21+ Age Verification Checkbox
         if (empty($_POST['bns_age_verification'])) {
             wc_add_notice(__('You must verify that you are at least 21 years of age to rent a hookah.', 'hookah-rental-core'), 'error');
         }
 
-        // Validate Serviceability against the strict 3-District rule (Kolkata, North 24 Parganas, South 24 Parganas)
+        // 2. Mandatory Indian Mobile Number Validation
+        $raw_phone = !empty($_POST['billing_phone']) ? sanitize_text_field($_POST['billing_phone']) : '';
+        $clean_phone = preg_replace('/[^0-9]/', '', $raw_phone);
+        if (strlen($clean_phone) === 12 && substr($clean_phone, 0, 2) === '91') {
+            $clean_phone = substr($clean_phone, 2);
+        } elseif (strlen($clean_phone) === 11 && substr($clean_phone, 0, 1) === '0') {
+            $clean_phone = substr($clean_phone, 1);
+        }
+
+        if (empty($clean_phone)) {
+            wc_add_notice(__('Mobile Number is required. Please enter your 10-digit Indian mobile number.', 'hookah-rental-core'), 'error');
+        } elseif (strlen($clean_phone) !== 10 || !in_array($clean_phone[0], ['6', '7', '8', '9'])) {
+            wc_add_notice(__('Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9 (e.g. 98300 12345).', 'hookah-rental-core'), 'error');
+        }
+
+        // 3. Validate Serviceability against the strict 3-District rule (Kolkata, North 24 Parganas, South 24 Parganas)
         $postcode = '';
         if (!empty($_POST['ship_to_different_address']) && !empty($_POST['shipping_postcode'])) {
             $postcode = sanitize_text_field($_POST['shipping_postcode']);
@@ -86,7 +102,7 @@ class Hookah_Checkout_Fields {
             if (!$serviceability['deliverable']) {
                 wc_add_notice(
                     sprintf(
-                        __('✕ DELIVERY NOT AVAILABLE: Sorry, ShishaRent currently delivers only within Kolkata, North 24 Parganas and South 24 Parganas. (Entered PIN: %s)', 'hookah-rental-core'),
+                        __('✕ DELIVERY NOT AVAILABLE: Sorry, BookMySmoke currently delivers only within Kolkata, North 24 Parganas and South 24 Parganas. (Entered PIN: %s)', 'hookah-rental-core'),
                         esc_html($postcode)
                     ),
                     'error'
@@ -104,6 +120,22 @@ class Hookah_Checkout_Fields {
         }
         if (!empty($_POST['bns_age_verification'])) {
             update_post_meta($order_id, '_bns_age_verified', 'yes');
+        }
+
+        // Ensure normalized Indian phone number is stored on order and billing meta
+        if (!empty($_POST['billing_phone'])) {
+            $raw_phone = sanitize_text_field($_POST['billing_phone']);
+            $clean_phone = preg_replace('/[^0-9]/', '', $raw_phone);
+            if (strlen($clean_phone) === 12 && substr($clean_phone, 0, 2) === '91') {
+                $clean_phone = substr($clean_phone, 2);
+            } elseif (strlen($clean_phone) === 11 && substr($clean_phone, 0, 1) === '0') {
+                $clean_phone = substr($clean_phone, 1);
+            }
+            if (strlen($clean_phone) === 10) {
+                $formatted_phone = '+91 ' . $clean_phone;
+                update_post_meta($order_id, '_billing_phone', $formatted_phone);
+                update_post_meta($order_id, '_bns_customer_phone', $formatted_phone);
+            }
         }
 
         $order = wc_get_order($order_id);

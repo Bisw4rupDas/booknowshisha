@@ -180,73 +180,53 @@
     </a>
 </div>
 
-<!-- Customer Mobile OTP Authentication Modal -->
-<div id="bns-auth-modal" class="bns-modal bns-otp-auth-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="bns-otp-modal-title">
+<!-- Customer Google Authentication Modal -->
+<div id="bns-auth-modal" class="bns-modal bns-google-auth-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="bns-google-modal-title">
     <div class="bns-modal-backdrop" id="bns-auth-backdrop"></div>
-    <div class="bns-modal-content bns-otp-modal-box">
-        <button type="button" class="bns-modal-close" id="bns-auth-close" aria-label="<?php esc_attr_e('Close Modal', 'shisharent'); ?>">âœ•</button>
+    <div class="bns-modal-content bns-google-modal-box">
+        <button type="button" class="bns-modal-close" id="bns-auth-close" aria-label="<?php esc_attr_e('Close Modal', 'shisharent'); ?>">✕</button>
         
-        <div class="bns-otp-header">
-            <div class="bns-otp-brand-icon">
+        <div class="bns-auth-header">
+            <div class="bns-auth-brand-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
             </div>
-            <span class="bns-otp-badge"><?php esc_html_e('KOLKATA VIP ACCESS', 'shisharent'); ?></span>
-            <h3 id="bns-otp-modal-title" class="bns-otp-title"><?php esc_html_e('SIGN IN WITH MOBILE', 'shisharent'); ?></h3>
-            <p class="bns-otp-subtitle"><?php esc_html_e('Enter your Indian mobile number to receive a secure 6-digit OTP.', 'shisharent'); ?></p>
+            <span class="bns-auth-badge"><?php esc_html_e('BOOKMYSMOKE', 'shisharent'); ?></span>
+            <h3 id="bns-google-modal-title" class="bns-auth-title"><?php esc_html_e('SIGN IN', 'shisharent'); ?></h3>
+            <p class="bns-auth-subtitle"><?php esc_html_e('Welcome to BookMySmoke. Sign in to access your Kolkata reservations, track active rentals, and speed up checkout.', 'shisharent'); ?></p>
         </div>
 
         <!-- Alert Notification Box -->
-        <div id="bns-otp-alert" class="bns-otp-alert" style="display:none;"></div>
+        <div id="bns-auth-alert" class="bns-auth-alert" style="display:none;"></div>
 
-        <!-- STEP 1: Phone Number Input -->
-        <form id="bns-otp-phone-form" class="bns-otp-form-step">
-            <div class="bns-otp-input-group">
-                <label for="bns-otp-phone-input" class="bns-otp-label"><?php esc_html_e('MOBILE NUMBER', 'shisharent'); ?> <span class="bns-req">*</span></label>
-                <div class="bns-phone-prefix-wrap">
-                    <span class="bns-phone-prefix">+91</span>
-                    <input type="tel" id="bns-otp-phone-input" name="phone" required placeholder="98300 12345" maxlength="10" pattern="[6-9][0-9]{9}" inputmode="numeric" autocomplete="tel-national" class="bns-otp-input" />
-                </div>
-                <span class="bns-otp-hint"><?php esc_html_e('Enter your 10-digit mobile number (e.g. 9830012345)', 'shisharent'); ?></span>
-            </div>
-
-            <button type="submit" id="bns-btn-send-otp" class="button bns-btn-otp-gold">
-                <span><?php esc_html_e('SEND OTP â†’', 'shisharent'); ?></span>
+        <!-- Google Single Sign-On Action -->
+        <div class="bns-google-action-wrap">
+            <button type="button" id="bns-btn-google-auth" class="bns-btn-google-auth" aria-label="<?php esc_attr_e('Continue with Google', 'shisharent'); ?>">
+                <span class="bns-google-icon-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                    </svg>
+                </span>
+                <span class="bns-google-text"><?php esc_html_e('Continue with Google', 'shisharent'); ?></span>
             </button>
-        </form>
+        </div>
 
-        <!-- STEP 2: OTP Verification -->
-        <form id="bns-otp-verify-form" class="bns-otp-form-step" style="display:none;">
-            <div class="bns-otp-phone-summary">
-                <span class="bns-ops-label"><?php esc_html_e('OTP sent to:', 'shisharent'); ?></span>
-                <strong id="bns-otp-sent-number" class="bns-ops-number">+91 ••••• •••••</strong>
-                <button type="button" id="bns-otp-edit-phone-btn" class="bns-btn-edit-phone" title="<?php esc_attr_e('Change mobile number', 'shisharent'); ?>">
-                    <?php esc_html_e('Change Number', 'shisharent'); ?>
-                </button>
-            </div>
-
-            <div class="bns-otp-input-group">
-                <label for="bns-otp-code-input" class="bns-otp-label"><?php esc_html_e('6-DIGIT OTP CODE', 'shisharent'); ?> <span class="bns-req">*</span></label>
-                <input type="text" id="bns-otp-code-input" name="otp" required placeholder="••••••" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" class="bns-otp-input bns-otp-code-field" />
-                <div class="bns-otp-resend-row">
-                    <span id="bns-otp-timer-text" class="bns-otp-timer"><?php esc_html_e('Resend OTP in 30s', 'shisharent'); ?></span>
-                    <button type="button" id="bns-btn-resend-otp" class="bns-btn-resend" style="display:none;">
-                        <?php esc_html_e('Resend OTP', 'shisharent'); ?>
-                    </button>
-                </div>
-            </div>
-
-            <button type="submit" id="bns-btn-verify-otp" class="button bns-btn-otp-gold">
-                <span><?php esc_html_e('VERIFY & CONTINUE →', 'shisharent'); ?></span>
-            </button>
-        </form>
-
-        <!-- Compliance & Luxury Footer -->
-        <div class="bns-otp-footer-notice">
+        <!-- Compliance & Security Notice -->
+        <div class="bns-auth-footer-notice">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4a95f" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span><?php esc_html_e('21+ Legal Age Verification • Instant Access', 'shisharent'); ?></span>
+            <span><?php esc_html_e('21+ Legal Age Verification • Secure Single Sign-On', 'shisharent'); ?></span>
+        </div>
+
+        <!-- Administrator Direct Access Note -->
+        <div class="bns-admin-hint-row">
+            <a href="<?php echo esc_url(wp_login_url()); ?>" class="bns-admin-hint-link">
+                <?php esc_html_e('WordPress Administrator Login →', 'shisharent'); ?>
+            </a>
         </div>
     </div>
 </div>
