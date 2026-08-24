@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Footer template for ShishaRent Theme (Kolkata Edition)
  * Includes official shop address, quick links, and health/safety notice.
@@ -220,16 +220,16 @@
         <!-- STEP 2: OTP Verification -->
         <form id="bns-otp-verify-form" class="bns-otp-form-step" style="display:none;">
             <div class="bns-otp-phone-summary">
-                <span class="bns-ops-label"><?php esc_html_e('Code sent to:', 'shisharent'); ?></span>
-                <strong id="bns-otp-sent-number" class="bns-ops-number">+91 â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢</strong>
+                <span class="bns-ops-label"><?php esc_html_e('OTP sent to:', 'shisharent'); ?></span>
+                <strong id="bns-otp-sent-number" class="bns-ops-number">+91 ••••• •••••</strong>
                 <button type="button" id="bns-otp-edit-phone-btn" class="bns-btn-edit-phone" title="<?php esc_attr_e('Change mobile number', 'shisharent'); ?>">
-                    <?php esc_html_e('Change', 'shisharent'); ?>
+                    <?php esc_html_e('Change Number', 'shisharent'); ?>
                 </button>
             </div>
 
             <div class="bns-otp-input-group">
                 <label for="bns-otp-code-input" class="bns-otp-label"><?php esc_html_e('6-DIGIT OTP CODE', 'shisharent'); ?> <span class="bns-req">*</span></label>
-                <input type="text" id="bns-otp-code-input" name="otp" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" class="bns-otp-input bns-otp-code-field" />
+                <input type="text" id="bns-otp-code-input" name="otp" required placeholder="••••••" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" class="bns-otp-input bns-otp-code-field" />
                 <div class="bns-otp-resend-row">
                     <span id="bns-otp-timer-text" class="bns-otp-timer"><?php esc_html_e('Resend OTP in 30s', 'shisharent'); ?></span>
                     <button type="button" id="bns-btn-resend-otp" class="bns-btn-resend" style="display:none;">
@@ -239,14 +239,14 @@
             </div>
 
             <button type="submit" id="bns-btn-verify-otp" class="button bns-btn-otp-gold">
-                <span><?php esc_html_e('VERIFY & SIGN IN â†’', 'shisharent'); ?></span>
+                <span><?php esc_html_e('VERIFY & CONTINUE →', 'shisharent'); ?></span>
             </button>
         </form>
 
         <!-- Compliance & Luxury Footer -->
         <div class="bns-otp-footer-notice">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4a95f" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span><?php esc_html_e('21+ Legal Age Verification â€¢ Instant Access', 'shisharent'); ?></span>
+            <span><?php esc_html_e('21+ Legal Age Verification • Instant Access', 'shisharent'); ?></span>
         </div>
     </div>
 </div>

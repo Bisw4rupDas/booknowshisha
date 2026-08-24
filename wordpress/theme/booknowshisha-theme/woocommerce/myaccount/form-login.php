@@ -24,8 +24,8 @@ do_action('woocommerce_before_customer_login_form'); ?>
                 </svg>
             </div>
             <span class="bns-otp-badge"><?php esc_html_e('KOLKATA VIP ACCESS', 'shisharent'); ?></span>
-            <h2 class="bns-otp-title"><?php esc_html_e('CUSTOMER SIGN IN', 'shisharent'); ?></h2>
-            <p class="bns-otp-subtitle"><?php esc_html_e('Enter your 10-digit Indian mobile number to receive a secure 6-digit verification code.', 'shisharent'); ?></p>
+            <h2 id="bns-inpage-otp-title" class="bns-otp-title"><?php esc_html_e('SIGN IN WITH MOBILE', 'shisharent'); ?></h2>
+            <p id="bns-inpage-otp-subtitle" class="bns-otp-subtitle"><?php esc_html_e('Enter your 10-digit Indian mobile number to receive a secure 6-digit verification code.', 'shisharent'); ?></p>
         </div>
 
         <!-- Alert Notification Box -->
@@ -61,10 +61,10 @@ do_action('woocommerce_before_customer_login_form'); ?>
         <!-- STEP 2: OTP Verification -->
         <form id="bns-inpage-otp-verify-form" class="bns-otp-form-step bns-otp-verify-form" style="display:none;">
             <div class="bns-otp-phone-summary">
-                <span class="bns-ops-label"><?php esc_html_e('Code sent to:', 'shisharent'); ?></span>
-                <strong id="bns-inpage-otp-sent-number" class="bns-ops-number bns-otp-sent-number">+91 ••••••••••</strong>
-                <button type="button" id="bns-inpage-otp-edit-phone-btn" class="bns-btn-edit-phone bns-btn-edit-phone" title="<?php esc_attr_e('Change mobile number', 'shisharent'); ?>">
-                    <?php esc_html_e('Change', 'shisharent'); ?>
+                <span class="bns-ops-label"><?php esc_html_e('OTP sent to:', 'shisharent'); ?></span>
+                <strong id="bns-inpage-otp-sent-number" class="bns-ops-number bns-otp-sent-number">+91 ••••• •••••</strong>
+                <button type="button" id="bns-inpage-otp-edit-phone-btn" class="bns-btn-edit-phone" title="<?php esc_attr_e('Change mobile number', 'shisharent'); ?>">
+                    <?php esc_html_e('Change Number', 'shisharent'); ?>
                 </button>
             </div>
 
@@ -91,7 +91,7 @@ do_action('woocommerce_before_customer_login_form'); ?>
             </div>
 
             <button type="submit" id="bns-inpage-btn-verify-otp" class="button bns-btn-otp-gold bns-btn-verify-otp">
-                <span><?php esc_html_e('VERIFY & SIGN IN ?', 'shisharent'); ?></span>
+                <span><?php esc_html_e('VERIFY & CONTINUE ?', 'shisharent'); ?></span>
             </button>
         </form>
 

@@ -465,11 +465,13 @@
     });
 
     function resetOtpModal() {
+      $('#bns-otp-modal-title').text('SIGN IN WITH MOBILE');
+      $('#bns-otp-subtitle').text('Enter your Indian mobile number to receive a secure 6-digit OTP.');
       $('#bns-otp-alert').hide().text('').removeClass('bns-alert-error bns-alert-success');
       $('#bns-otp-phone-form').show();
       $('#bns-otp-verify-form').hide();
       $('#bns-btn-send-otp').prop('disabled', false).find('span').text('SEND OTP →');
-      $('#bns-btn-verify-otp').prop('disabled', false).find('span').text('VERIFY & SIGN IN →');
+      $('#bns-btn-verify-otp').prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
       $('#bns-otp-code-input').val('');
       clearInterval(otpTimerInterval);
     }
@@ -521,6 +523,8 @@
           $btn.prop('disabled', false).find('span').text('SEND OTP →');
           if (res && res.success) {
             currentOtpPhone = cleanPhone;
+            $('#bns-otp-modal-title').text('VERIFY YOUR MOBILE NUMBER');
+            $('#bns-otp-subtitle').text('Enter the 6-digit verification code sent to your mobile.');
             $('#bns-otp-sent-number').text(res.data.masked_phone || ('+91 ' + cleanPhone));
             $('#bns-otp-phone-form').hide();
             $('#bns-otp-verify-form').fadeIn(200);
@@ -575,14 +579,14 @@
               }
             }, 600);
           } else {
-            $btn.prop('disabled', false).find('span').text('VERIFY & SIGN IN →');
+            $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
             var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Invalid OTP code. Please try again.';
             showOtpAlert(errMsg, 'error', false);
             $('#bns-otp-code-input').focus();
           }
         },
         error: function() {
-          $btn.prop('disabled', false).find('span').text('VERIFY & SIGN IN →');
+          $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
           showOtpAlert('Network error during verification. Please try again.', 'error', false);
         }
       });
@@ -623,6 +627,8 @@
     $('#bns-otp-edit-phone-btn').on('click', function(e) {
       e.preventDefault();
       clearInterval(otpTimerInterval);
+      $('#bns-otp-modal-title').text('SIGN IN WITH MOBILE');
+      $('#bns-otp-subtitle').text('Enter your Indian mobile number to receive a secure 6-digit OTP.');
       $('#bns-otp-verify-form').hide();
       $('#bns-otp-phone-form').fadeIn(200);
       $('#bns-otp-phone-input').focus();
@@ -658,6 +664,8 @@
           $btn.prop('disabled', false).find('span').text('SEND OTP →');
           if (res && res.success) {
             inpageOtpPhone = cleanPhone;
+            $('#bns-inpage-otp-title').text('VERIFY YOUR MOBILE NUMBER');
+            $('#bns-inpage-otp-subtitle').text('Enter the 6-digit verification code sent to your mobile.');
             $('#bns-inpage-otp-sent-number').text(res.data.masked_phone || ('+91 ' + cleanPhone));
             $('#bns-inpage-otp-phone-form').hide();
             $('#bns-inpage-otp-verify-form').fadeIn(200);
@@ -712,14 +720,14 @@
               }
             }, 600);
           } else {
-            $btn.prop('disabled', false).find('span').text('VERIFY & SIGN IN →');
+            $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
             var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Invalid OTP code. Please try again.';
             showOtpAlert(errMsg, 'error', true);
             $('#bns-inpage-otp-code-input').focus();
           }
         },
         error: function() {
-          $btn.prop('disabled', false).find('span').text('VERIFY & SIGN IN →');
+          $btn.prop('disabled', false).find('span').text('VERIFY & CONTINUE →');
           showOtpAlert('Network error during verification. Please try again.', 'error', true);
         }
       });
@@ -760,10 +768,13 @@
     $('#bns-inpage-otp-edit-phone-btn').on('click', function(e) {
       e.preventDefault();
       clearInterval(inpageTimerInterval);
+      $('#bns-inpage-otp-title').text('SIGN IN WITH MOBILE');
+      $('#bns-inpage-otp-subtitle').text('Enter your 10-digit Indian mobile number to receive a secure 6-digit verification code.');
       $('#bns-inpage-otp-verify-form').hide();
       $('#bns-inpage-otp-phone-form').fadeIn(200);
       $('#bns-inpage-otp-phone-input').focus();
     });
+
 
     // Common Resend Timer Function
     function startResendTimer(seconds, isPage) {
