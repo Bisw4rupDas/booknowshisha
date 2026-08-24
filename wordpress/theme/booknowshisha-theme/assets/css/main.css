@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    1. CSS VARIABLES & THEME TOKENS (LIGHT & DARK MODES)
    ========================================================================== */
 :root,
@@ -6838,5 +6838,36 @@ html[data-theme="light"] .bns-otp-input {
   color: #0f172a !important;
 }
 
+/* In-Page / My-Account OTP Container */
+.bns-myaccount-auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 55vh;
+  padding: 40px 16px;
+  width: 100%;
+}
 
+.bns-myaccount-otp-card {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
 
+.bns-admin-hint-row {
+  text-align: center;
+  margin-top: 14px;
+}
+
+.bns-admin-hint-link {
+  font-size: 0.76rem;
+  color: var(--bns-text-muted, #94a3b8);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  letter-spacing: 0.03em;
+}
+
+.bns-admin-hint-link:hover {
+  color: var(--bns-accent-gold, #d4a95f);
+  text-decoration: underline;
+}

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Header template for ShishaRent Theme (Kolkata Edition)
  * Includes Light/Dark theme initialization and accessible theme toggle controls.
@@ -141,7 +141,7 @@
                     ?>
                     <!-- Account Dropdown Component -->
                     <div class="bns-account-dropdown-wrapper">
-                        <a href="<?php echo esc_url($account_url); ?>" class="bns-action-icon bns-account-trigger <?php echo $is_logged_in ? 'is-logged-in' : ''; ?>" title="<?php echo $is_logged_in ? esc_attr(sprintf(__('My Account (%s)', 'shisharent'), $user_name)) : esc_attr__('Sign In / My Account', 'shisharent'); ?>" aria-label="<?php esc_attr_e('My Account', 'shisharent'); ?>" aria-haspopup="true" aria-expanded="false" id="bns-account-trigger">
+                        <a href="<?php echo esc_url($account_url); ?>" class="bns-action-icon bns-account-trigger <?php echo $is_logged_in ? 'is-logged-in' : 'bns-trigger-otp-login'; ?>" data-logged-in="<?php echo $is_logged_in ? '1' : '0'; ?>" title="<?php echo $is_logged_in ? esc_attr(sprintf(__('My Account (%s)', 'shisharent'), $user_name)) : esc_attr__('Sign In with Mobile OTP', 'shisharent'); ?>" aria-label="<?php esc_attr_e('My Account', 'shisharent'); ?>" aria-haspopup="true" aria-expanded="false" id="bns-account-trigger">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
@@ -197,10 +197,10 @@
                                 <?php else: ?>
                                     <div class="bns-account-guest-header">
                                         <span class="bns-guest-badge"><?php esc_html_e('BOOKMYSMOKE ACCOUNT', 'shisharent'); ?></span>
-                                        <h4 class="bns-guest-title"><?php esc_html_e('Sign In to Your Account', 'shisharent'); ?></h4>
-                                        <p class="bns-guest-desc"><?php esc_html_e('Access your active hookah reservations, saved Kolkata addresses & speed up checkout.', 'shisharent'); ?></p>
-                                        <a href="<?php echo esc_url($account_url); ?>" class="button bns-btn-account-login">
-                                            <?php esc_html_e('SIGN IN / REGISTER â†’', 'shisharent'); ?>
+                                        <h4 class="bns-guest-title"><?php esc_html_e('Sign In with Mobile OTP', 'shisharent'); ?></h4>
+                                        <p class="bns-guest-desc"><?php esc_html_e('Access your active hookah reservations, saved Kolkata addresses & fast OTP checkout.', 'shisharent'); ?></p>
+                                        <a href="#" class="button bns-btn-account-login bns-trigger-otp-login">
+                                            <?php esc_html_e('SIGN IN WITH MOBILE OTP →', 'shisharent'); ?>
                                         </a>
                                     </div>
                                     <div class="bns-account-guest-links">
@@ -311,8 +311,8 @@
                                 <strong><?php esc_html_e('Account & Reservations', 'shisharent'); ?></strong>
                                 <p><?php esc_html_e('Sign in to track active rentals & saved addresses.', 'shisharent'); ?></p>
                             </div>
-                            <a href="<?php echo esc_url($account_url); ?>" class="bns-btn-mobile-login">
-                                <?php esc_html_e('SIGN IN / REGISTER â†’', 'shisharent'); ?>
+                            <a href="#" class="bns-btn-mobile-login bns-trigger-otp-login">
+                                <?php esc_html_e('SIGN IN WITH MOBILE OTP →', 'shisharent'); ?>
                             </a>
                         </div>
                     <?php endif; ?>
@@ -327,9 +327,9 @@
                     
                     <?php if (class_exists('WooCommerce')): ?>
                         <li class="bns-mobile-menu-section-heading"><?php esc_html_e('My Account & Bookings', 'shisharent'); ?></li>
-                        <li><a href="<?php echo esc_url($orders_url); ?>" class="bns-mobile-link bns-sub-link"><?php esc_html_e('ðŸ“¦ My Orders & Rental Bookings', 'shisharent'); ?></a></li>
-                        <li><a href="<?php echo esc_url($address_url); ?>" class="bns-mobile-link bns-sub-link"><?php esc_html_e('ðŸ“ Saved Delivery Addresses', 'shisharent'); ?></a></li>
-                        <li><a href="<?php echo esc_url($details_url); ?>" class="bns-mobile-link bns-sub-link"><?php esc_html_e('ðŸ‘¤ Account Details & Security', 'shisharent'); ?></a></li>
+                        <li><a href="<?php echo esc_url($orders_url); ?>" class="bns-mobile-link bns-sub-link"><?php esc_html_e('My Orders & Rental Bookings', 'shisharent'); ?></a></li>
+                        <li><a href="<?php echo esc_url($address_url); ?>" class="bns-mobile-link bns-sub-link"><?php esc_html_e('Saved Delivery Addresses', 'shisharent'); ?></a></li>
+                        <li><a href="<?php echo esc_url($details_url); ?>" class="bns-mobile-link bns-sub-link"><?php esc_html_e('Account Details & Security', 'shisharent'); ?></a></li>
                     <?php endif; ?>
 
                     <li class="bns-mobile-menu-section-heading"><?php esc_html_e('Services & Catering', 'shisharent'); ?></li>
@@ -337,7 +337,7 @@
                     <li><a href="<?php echo esc_url(home_url('/party-occasion-hookah/')); ?>" class="bns-mobile-link bns-sub-link"><?php esc_html_e('Party & Occasion Hookah', 'shisharent'); ?></a></li>
                     
                     <li class="bns-mobile-menu-section-heading"><?php esc_html_e('Products & Showcase', 'shisharent'); ?></li>
-                    <li><a href="<?php echo esc_url(home_url('/gallery/')); ?>" class="bns-mobile-link <?php echo is_page('gallery') ? 'active' : ''; ?>"><?php esc_html_e('ðŸ“¸ Gallery Showcase', 'shisharent'); ?></a></li>
+                    <li><a href="<?php echo esc_url(home_url('/gallery/')); ?>" class="bns-mobile-link <?php echo is_page('gallery') ? 'active' : ''; ?>"><?php esc_html_e('Gallery Showcase', 'shisharent'); ?></a></li>
                     <li><a href="<?php echo esc_url(home_url('/#rentals')); ?>" class="bns-mobile-link"><?php esc_html_e('Rental Options', 'shisharent'); ?></a></li>
                     <li><a href="<?php echo esc_url(home_url('/flavour-selection/')); ?>" class="bns-mobile-link"><?php esc_html_e('Flavour Selection', 'shisharent'); ?></a></li>
                     <?php if (class_exists('WooCommerce')): ?>
