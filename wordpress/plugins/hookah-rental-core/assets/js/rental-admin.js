@@ -1,0 +1,10 @@
+/**
+ * Hookah Rental Core - Admin JavaScript
+ */
+(function($) {
+  'use strict';
+
+  $(document).ready(function() {
+    // Admin settings scripts
+  });
+})(jQuery);

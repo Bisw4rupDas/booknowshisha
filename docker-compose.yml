@@ -1,0 +1,137 @@
+services:
+  # ============================================================================
+  # 1. PostgreSQL Database Service
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: booknowshisha-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-booknowshisha_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-booknowshisha_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - booknowshisha-network
+
+  # ============================================================================
+  # 2. Redis Cache & Fast State Store
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: booknowshisha-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - booknowshisha-network
+
+  # ============================================================================
+  # 3. NestJS Backend API Service
+  # ============================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: booknowshisha-backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${PORT:-3000}
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-booknowshisha_db}?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-super_secret_jwt_key_change_in_production_min_32_chars}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
+      WORDPRESS_URL: ${WORDPRESS_URL:-http://wordpress:80}
+      WOOCOMMERCE_CONSUMER_KEY: ${WOOCOMMERCE_CONSUMER_KEY:-}
+      WOOCOMMERCE_CONSUMER_SECRET: ${WOOCOMMERCE_CONSUMER_SECRET:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      UPI_GATEWAY_KEY_ID: ${UPI_GATEWAY_KEY_ID:-}
+      UPI_GATEWAY_KEY_SECRET: ${UPI_GATEWAY_KEY_SECRET:-}
+      UPI_WEBHOOK_SECRET: ${UPI_WEBHOOK_SECRET:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - booknowshisha-network
+
+  # ============================================================================
+  # 4. WordPress Local Database (MySQL)
+  # ============================================================================
+  wp-mysql:
+    image: mysql:8.0
+    container_name: booknowshisha-wp-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wp_password}
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME:-wordpress_db}
+      MYSQL_USER: ${WORDPRESS_DB_USER:-wp_user}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wp_password}
+    volumes:
+      - wp_db_data:/var/lib/mysql
+    networks:
+      - booknowshisha-network
+
+  # ============================================================================
+  # 5. WordPress Frontend / WooCommerce Development Environment
+  # ============================================================================
+  wordpress:
+    image: wordpress:latest
+    container_name: booknowshisha-wordpress
+    restart: unless-stopped
+    ports:
+      - "${WORDPRESS_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: wp-mysql:3306
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER:-wp_user}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wp_password}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME:-wordpress_db}
+      WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX:-bns_}
+      WORDPRESS_DEBUG: 1
+    volumes:
+      - wp_core_data:/var/www/html
+      - ./wordpress/theme/booknowshisha-theme:/var/www/html/wp-content/themes/booknowshisha-theme
+      - ./wordpress/plugins/hookah-rental-core:/var/www/html/wp-content/plugins/hookah-rental-core
+    depends_on:
+      - wp-mysql
+    networks:
+      - booknowshisha-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  wp_db_data:
+    driver: local
+  wp_core_data:
+    driver: local
+
+networks:
+  booknowshisha-network:
+    driver: bridge

@@ -1,0 +1,25 @@
+/**
+ * Hookah Rental Core - Admin Stylesheet
+ */
+.toplevel_page_hookah-rental-settings .dashicons-smoke {
+  color: #d4af37;
+}
+
+.bns-admin-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.bns-badge-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.bns-badge-rented {
+  background: #fef3c7;
+  color: #92400e;
+}

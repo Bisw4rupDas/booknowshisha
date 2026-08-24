@@ -1,0 +1,621 @@
+// ==============================================================================
+// BookNowShisha - Prisma Schema
+// PostgreSQL Relational Database Models
+// ==============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------------------------
+// ENUMS
+// ------------------------------------------------------------------------------
+
+enum UserRole {
+  CUSTOMER
+  STAFF
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum BookingStatus {
+  DRAFT
+  PENDING
+  CONFIRMED
+  CANCELLED
+  EXPIRED
+}
+
+enum RentalStatus {
+  RESERVED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  ACTIVE
+  RETURN_PENDING
+  RETURNED
+  INSPECTED
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  CONFIRMED
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  COD
+  UPI
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum DeliveryStatus {
+  PENDING
+  ASSIGNED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RESCHEDULED
+}
+
+enum InspectionStatus {
+  PENDING
+  PASSED
+  DAMAGED
+  MISSING_ITEMS
+}
+
+enum HookahCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  MAINTENANCE
+  RETIRED
+}
+
+enum HookahInventoryStatus {
+  AVAILABLE
+  RESERVED
+  RENTED
+  IN_MAINTENANCE
+  DECOMMISSIONED
+}
+
+// ------------------------------------------------------------------------------
+// 1. IDENTITY & USER MANAGEMENT
+// ------------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String?
+  role         UserRole  @default(CUSTOMER)
+  isActive     Boolean   @default(true)
+  isVerified   Boolean   @default(false)
+  googleId     String?   @unique
+  twoFactorSecret String?
+  twoFactorEnabled Boolean @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Profile Relations
+  customer     Customer?
+  staff        Staff?
+  admin        Admin?
+
+  // System Logs & Notifications
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model Customer {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String
+  lastName        String
+  phone           String?   @unique
+  alternatePhone  String?
+  addressLine1    String?
+  addressLine2    String?
+  city            String?
+  postalCode      String?
+  avatarUrl       String?
+  wpCustomerId    Int?      @unique // WooCommerce Customer ID mapping
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  bookings        Booking[]
+  rentals         Rental[]
+  orders          Order[]
+
+  @@map("customers")
+}
+
+model Staff {
+  id          String     @id @default(uuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName    String
+  phone       String
+  designation String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  assignedDeliveries Delivery[]
+  cashCollections    CashCollection[]
+  inspections        ReturnInspection[]
+
+  @@map("staff")
+}
+
+model Admin {
+  id          String     @id @default(uuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName    String
+  department  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("admins")
+}
+
+// ------------------------------------------------------------------------------
+// 2. HOOKAH & INVENTORY MANAGEMENT
+// ------------------------------------------------------------------------------
+
+model HookahModel {
+  id          String            @id @default(uuid())
+  name        String
+  slug        String            @unique
+  description String?
+  heightCm    Float?
+  material    String?
+  basePrice   Decimal           @db.Decimal(10, 2)
+  depositFee  Decimal           @default(0.00) @db.Decimal(10, 2)
+  imageUrl    String?
+  isActive    Boolean           @default(true)
+  wpProductId Int?              @unique // WooCommerce Product ID mapping
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  inventory   HookahInventory[]
+  packageItems PackageItem[]
+
+  @@map("hookah_models")
+}
+
+model HookahInventory {
+  id            String                @id @default(uuid())
+  hookahModelId String
+  hookahModel   HookahModel           @relation(fields: [hookahModelId], references: [id], onDelete: Restrict)
+  serialNumber  String                @unique
+  barcode       String?               @unique
+  condition     HookahCondition       @default(EXCELLENT)
+  status        HookahInventoryStatus @default(AVAILABLE)
+  notes         String?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  rentalItems   RentalItem[]
+
+  @@map("hookah_inventories")
+}
+
+// ------------------------------------------------------------------------------
+// 3. FLAVOURS & CONSUMABLES
+// ------------------------------------------------------------------------------
+
+model FlavourCategory {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  flavours    Flavour[]
+
+  @@map("flavour_categories")
+}
+
+model Flavour {
+  id          String          @id @default(uuid())
+  categoryId  String
+  category    FlavourCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  name        String
+  slug        String          @unique
+  brand       String?
+  description String?
+  isNicotine  Boolean         @default(true)
+  imageUrl    String?
+  isActive    Boolean         @default(true)
+  wpProductId Int?            @unique
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  stock       FlavourStock?
+  rentalItems RentalItem[]
+
+  @@map("flavours")
+}
+
+model FlavourStock {
+  id            String   @id @default(uuid())
+  flavourId     String   @unique
+  flavour       Flavour  @relation(fields: [flavourId], references: [id], onDelete: Cascade)
+  quantityUnits Int      @default(0) // Available heads/bowls or grams
+  lowStockAlert Int      @default(10)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("flavour_stocks")
+}
+
+// ------------------------------------------------------------------------------
+// 4. PACKAGES & CONFIGURATION
+// ------------------------------------------------------------------------------
+
+model Package {
+  id          String        @id @default(uuid())
+  name        String
+  slug        String        @unique
+  description String?
+  price       Decimal       @db.Decimal(10, 2)
+  durationHrs Int           @default(24) // Rental duration in hours (e.g. 24, 48, 72)
+  maxFlavours Int           @default(2)
+  includesCoals Boolean     @default(true)
+  includesMouthpieces Int   @default(4)
+  imageUrl    String?
+  isActive    Boolean       @default(true)
+  wpProductId Int?          @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  items       PackageItem[]
+  bookings    Booking[]
+  rentals     Rental[]
+
+  @@map("packages")
+}
+
+model PackageItem {
+  id            String      @id @default(uuid())
+  packageId     String
+  package       Package     @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  hookahModelId String
+  hookahModel   HookahModel @relation(fields: [hookahModelId], references: [id], onDelete: Restrict)
+  quantity      Int         @default(1)
+
+  @@map("package_items")
+}
+
+// ------------------------------------------------------------------------------
+// 5. BOOKINGS & RENTALS
+// ------------------------------------------------------------------------------
+
+model Booking {
+  id            String        @id @default(uuid())
+  bookingNumber String        @unique
+  customerId    String
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  packageId     String
+  package       Package       @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  status        BookingStatus @default(PENDING)
+  rentalStart   DateTime
+  rentalEnd     DateTime
+  durationHours Int
+  totalAmount   Decimal       @db.Decimal(10, 2)
+  depositAmount Decimal       @default(0.00) @db.Decimal(10, 2)
+  deliverySlotId String?
+  deliverySlot  DeliverySlot? @relation(fields: [deliverySlotId], references: [id], onDelete: SetNull)
+  deliveryAddress String
+  postalCode    String
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  rental        Rental?
+  order         Order?
+
+  @@map("bookings")
+}
+
+model Rental {
+  id            String        @id @default(uuid())
+  rentalNumber  String        @unique
+  bookingId     String        @unique
+  booking       Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  customerId    String
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  packageId     String
+  package       Package       @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  status        RentalStatus  @default(RESERVED)
+  startDate     DateTime
+  endDate       DateTime
+  actualReturn  DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  items         RentalItem[]
+  deliveries    Delivery[]
+  inspection    ReturnInspection?
+  damageReports DamageReport[]
+  securityDeposit SecurityDeposit?
+
+  @@map("rentals")
+}
+
+model RentalItem {
+  id                String           @id @default(uuid())
+  rentalId          String
+  rental            Rental           @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+  hookahInventoryId String?
+  hookahInventory   HookahInventory? @relation(fields: [hookahInventoryId], references: [id], onDelete: SetNull)
+  flavourId         String?
+  flavour           Flavour?         @relation(fields: [flavourId], references: [id], onDelete: SetNull)
+  notes             String?
+
+  @@map("rental_items")
+}
+
+// ------------------------------------------------------------------------------
+// 6. E-COMMERCE ORDERS & COMMERCE
+// ------------------------------------------------------------------------------
+
+model Order {
+  id          String      @id @default(uuid())
+  orderNumber String      @unique
+  customerId  String
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  bookingId   String?     @unique
+  booking     Booking?    @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  wpOrderId   Int?        @unique // WooCommerce Order ID mapping
+  status      OrderStatus @default(PENDING)
+  subtotal    Decimal     @db.Decimal(10, 2)
+  discount    Decimal     @default(0.00) @db.Decimal(10, 2)
+  deliveryFee Decimal     @default(0.00) @db.Decimal(10, 2)
+  deposit     Decimal     @default(0.00) @db.Decimal(10, 2)
+  totalAmount Decimal     @db.Decimal(10, 2)
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  items       OrderItem[]
+  payments    Payment[]
+  deliveries  Delivery[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  wpProductId Int?
+  name        String
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  totalPrice  Decimal  @db.Decimal(10, 2)
+
+  @@map("order_items")
+}
+
+// ------------------------------------------------------------------------------
+// 7. DELIVERY & LOGISTICS
+// ------------------------------------------------------------------------------
+
+model DeliveryZone {
+  id          String         @id @default(uuid())
+  name        String
+  postalCodes String[]       // Supported PIN / Postal Codes
+  baseFee     Decimal        @default(0.00) @db.Decimal(10, 2)
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  slots       DeliverySlot[]
+
+  @@map("delivery_zones")
+}
+
+model DeliverySlot {
+  id          String       @id @default(uuid())
+  zoneId      String
+  zone        DeliveryZone @relation(fields: [zoneId], references: [id], onDelete: Restrict)
+  startTime   String       // Format: "HH:mm" e.g. "14:00"
+  endTime     String       // Format: "HH:mm" e.g. "16:00"
+  maxCapacity Int          @default(5)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  bookings    Booking[]
+  deliveries  Delivery[]
+
+  @@map("delivery_slots")
+}
+
+model Delivery {
+  id             String         @id @default(uuid())
+  deliveryNumber String         @unique
+  orderId        String?
+  order          Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  rentalId       String?
+  rental         Rental?        @relation(fields: [rentalId], references: [id], onDelete: SetNull)
+  staffId        String?
+  staff          Staff?         @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  slotId         String?
+  slot           DeliverySlot?  @relation(fields: [slotId], references: [id], onDelete: SetNull)
+  status         DeliveryStatus @default(PENDING)
+  scheduledDate  DateTime
+  deliveryAddress String
+  deliveredAt    DateTime?
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("deliveries")
+}
+
+// ------------------------------------------------------------------------------
+// 8. PAYMENTS & FINANCIAL MANAGEMENT
+// ------------------------------------------------------------------------------
+
+model Payment {
+  id            String        @id @default(uuid())
+  paymentNumber String        @unique
+  orderId       String
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("INR")
+  gatewayTxnId  String?       @unique // UPI Transaction Reference ID
+  gatewayRaw    Json?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  cashCollection CashCollection?
+
+  @@map("payments")
+}
+
+model CashCollection {
+  id           String    @id @default(uuid())
+  paymentId    String    @unique
+  payment      Payment   @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  collectedBy  String
+  staff        Staff     @relation(fields: [collectedBy], references: [id], onDelete: Restrict)
+  amount       Decimal   @db.Decimal(10, 2)
+  collectedAt  DateTime  @default(now())
+  reconciled   Boolean   @default(false)
+  reconciledAt DateTime?
+  notes        String?
+
+  @@map("cash_collections")
+}
+
+model SecurityDeposit {
+  id             String    @id @default(uuid())
+  rentalId       String    @unique
+  rental         Rental    @relation(fields: [rentalId], references: [id], onDelete: Restrict)
+  amount         Decimal   @db.Decimal(10, 2)
+  heldAt         DateTime  @default(now())
+  isRefunded     Boolean   @default(false)
+  refundAmount   Decimal?  @db.Decimal(10, 2)
+  deductionAmount Decimal? @db.Decimal(10, 2)
+  refundedAt     DateTime?
+  notes          String?
+
+  @@map("security_deposits")
+}
+
+// ------------------------------------------------------------------------------
+// 9. RETURNS & INSPECTIONS
+// ------------------------------------------------------------------------------
+
+model ReturnInspection {
+  id           String           @id @default(uuid())
+  rentalId     String           @unique
+  rental       Rental           @relation(fields: [rentalId], references: [id], onDelete: Restrict)
+  inspectedBy  String
+  staff        Staff            @relation(fields: [inspectedBy], references: [id], onDelete: Restrict)
+  status       InspectionStatus @default(PENDING)
+  isClean      Boolean          @default(true)
+  allPartsPresent Boolean       @default(true)
+  notes        String?
+  inspectedAt  DateTime         @default(now())
+
+  damageReport DamageReport?
+
+  @@map("return_inspections")
+}
+
+model DamageReport {
+  id           String            @id @default(uuid())
+  rentalId     String
+  rental       Rental            @relation(fields: [rentalId], references: [id], onDelete: Restrict)
+  inspectionId String?           @unique
+  inspection   ReturnInspection? @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
+  description  String
+  damageCost   Decimal           @db.Decimal(10, 2)
+  photos       String[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@map("damage_reports")
+}
+
+// ------------------------------------------------------------------------------
+// 10. MARKETING, NOTIFICATIONS & AUDIT LOGS
+// ------------------------------------------------------------------------------
+
+model Coupon {
+  id             String    @id @default(uuid())
+  code           String    @unique
+  discountPercent Float?
+  discountAmount Decimal?  @db.Decimal(10, 2)
+  minSpend       Decimal?  @db.Decimal(10, 2)
+  validFrom      DateTime
+  validUntil     DateTime
+  usageLimit     Int?
+  usageCount     Int       @default(0)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("coupons")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, BOOKING, RENTAL, PAYMENT, SECURITY
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // e.g. "AUTH_LOGIN", "RENTAL_STATUS_CHANGE", "CASH_COLLECTED"
+  entity    String   // e.g. "Rental", "Order", "HookahInventory"
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}

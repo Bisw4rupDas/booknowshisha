@@ -1,0 +1,15 @@
+/*
+Theme Name: ShishaRent Theme
+Theme URI: https://shisharent.com
+Author: ShishaRent Engineering
+Author URI: https://shisharent.com
+Description: Premium Light/Dark luxury theme custom-engineered for ShishaRent e-commerce, hookah rentals, and party event catering in Kolkata.
+Version: 1.3.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 8.1
+License: Proprietary
+Text Domain: shisharent
+*/
+
+@import url('assets/css/main.css');
