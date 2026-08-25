@@ -1286,13 +1286,28 @@ function bns_send_clean_json($success, $data, $status_code = null) {
     if (!headers_sent()) {
         header('Content-Type: application/json; charset=UTF-8');
         header('X-Content-Type-Options: nosniff');
+        if ($status_code) {
+            status_header($status_code);
+        }
     }
-    if ($success) {
-        wp_send_json_success($data, $status_code ?: 200);
+    $message = '';
+    if (is_array($data) && isset($data['message'])) {
+        $message = $data['message'];
+    } elseif (is_string($data)) {
+        $message = $data;
+        $data = ['message' => $message];
+    }
+    $response = [
+        'success' => (bool)$success,
+        'message' => $message,
+        'data'    => $data,
+    ];
+    echo wp_json_encode($response);
+    if (function_exists('wp_die')) {
+        wp_die('', '', ['response' => null]);
     } else {
-        wp_send_json_error($data, $status_code ?: 400);
+        exit;
     }
-    exit;
 }
 
 /**
@@ -1317,7 +1332,7 @@ function bns_ajax_email_register() {
 
     if (email_exists($normalized_email) || username_exists($normalized_email)) {
         bns_send_clean_json(false, [
-            'message' => __('An account with this email address already exists. Please sign in or reset your password.', 'shisharent'),
+            'message' => __('An account with this email already exists. Please sign in.', 'shisharent'),
         ], 400);
     }
 

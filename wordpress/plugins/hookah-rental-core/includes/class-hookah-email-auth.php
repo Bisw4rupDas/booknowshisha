@@ -21,13 +21,28 @@ class Hookah_Email_Auth {
         if (!headers_sent()) {
             header('Content-Type: application/json; charset=UTF-8');
             header('X-Content-Type-Options: nosniff');
+            if ($status_code) {
+                status_header($status_code);
+            }
         }
-        if ($success) {
-            $this->send_clean_json(true, $data, $status_code ?: 200);
+        $message = '';
+        if (is_array($data) && isset($data['message'])) {
+            $message = $data['message'];
+        } elseif (is_string($data)) {
+            $message = $data;
+            $data = ['message' => $message];
+        }
+        $response = [
+            'success' => (bool)$success,
+            'message' => $message,
+            'data'    => $data,
+        ];
+        echo wp_json_encode($response);
+        if (function_exists('wp_die')) {
+            wp_die('', '', ['response' => null]);
         } else {
-            $this->send_clean_json(false, $data, $status_code ?: 400);
+            exit;
         }
-        exit;
     }
 
 
@@ -180,7 +195,7 @@ class Hookah_Email_Auth {
         $normalized_email = strtolower($email);
         if (email_exists($normalized_email) || get_user_by('email', $normalized_email) || username_exists($normalized_email)) {
             $this->send_clean_json(false, [
-                'message' => __('An account with this email address already exists. Please sign in or reset your password.', 'hookah-rental-core'),
+                'message' => __('An account with this email already exists. Please sign in.', 'hookah-rental-core'),
             ]);
         }
 

@@ -346,26 +346,25 @@
               }
             }
           }
-          if (res && res.success) {
+          if (res && (res.success === true || res.success === 'true' || res.success === 1)) {
             $btnText.text('Account Created!');
-            var successMsg = (res.data && res.data.message) ? res.data.message : 'Account created successfully! Welcome to ShishaRent.';
+            var successMsg = (res.message) ? res.message : ((res.data && res.data.message) ? res.data.message : 'Account created successfully! Welcome to ShishaRent.');
             showAuthAlert(successMsg, 'success', isPage);
             if (typeof showToast === 'function') {
               showToast('Account Created', successMsg, 'success');
             }
+            var redirectUrl = (res.data && res.data.redirect) ? res.data.redirect : (res.redirect ? res.redirect : window.location.href);
             setTimeout(function() {
-              if (res.data && res.data.redirect) {
-                window.location.href = res.data.redirect;
-              } else {
-                location.reload();
-              }
+              window.location.href = redirectUrl;
             }, 600);
           } else {
             $btn.prop('disabled', false).removeClass('is-loading');
             $btnText.text(origText);
             var errMsg = 'Could not create account. Please try again.';
             if (res) {
-              if (res.data) {
+              if (res.message) {
+                errMsg = res.message;
+              } else if (res.data) {
                 if (typeof res.data === 'string') {
                   errMsg = res.data;
                 } else if (res.data.message) {
@@ -373,8 +372,6 @@
                 } else if (res.data.error) {
                   errMsg = res.data.error;
                 }
-              } else if (res.message) {
-                errMsg = res.message;
               }
             }
             console.error('[ShishaRent Registration Error]', { response: res, errorMessage: errMsg });
@@ -387,52 +384,44 @@
           var errMsg = 'Could not create account. Please try again.';
           
           if (xhr) {
+            var parsed = null;
             if (xhr.responseJSON) {
-              if (xhr.responseJSON.data) {
-                if (typeof xhr.responseJSON.data === 'string') {
-                  errMsg = xhr.responseJSON.data;
-                } else if (xhr.responseJSON.data.message) {
-                  errMsg = xhr.responseJSON.data.message;
-                }
-              } else if (xhr.responseJSON.message) {
-                errMsg = xhr.responseJSON.message;
-              }
+              parsed = xhr.responseJSON;
             } else if (xhr.responseText) {
               try {
-                var parsed = JSON.parse(xhr.responseText);
-                if (parsed.success && parsed.data) {
-                  $btnText.text('Account Created!');
-                  showAuthAlert(parsed.data.message || 'Account created successfully!', 'success', isPage);
-                  setTimeout(function() {
-                    window.location.href = parsed.data.redirect || window.location.href;
-                  }, 600);
-                  return;
-                } else if (parsed.data && parsed.data.message) {
-                  errMsg = parsed.data.message;
-                } else if (parsed.message) {
-                  errMsg = parsed.message;
-                }
+                parsed = JSON.parse(xhr.responseText);
               } catch(e) {
                 var jsonMatch = xhr.responseText.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
-                  try {
-                    var parsed2 = JSON.parse(jsonMatch[0]);
-                    if (parsed2.success && parsed2.data) {
-                      $btnText.text('Account Created!');
-                      showAuthAlert(parsed2.data.message || 'Account created successfully!', 'success', isPage);
-                      setTimeout(function() {
-                        window.location.href = parsed2.data.redirect || window.location.href;
-                      }, 600);
-                      return;
-                    } else if (parsed2.data && parsed2.data.message) {
-                      errMsg = parsed2.data.message;
-                    }
-                  } catch(e3) {}
+                  try { parsed = JSON.parse(jsonMatch[0]); } catch(e3) {}
+                }
+              }
+            }
+
+            if (parsed) {
+              if (parsed.success === true || parsed.success === 'true' || parsed.success === 1) {
+                // Success occurred despite non-200 or wrapper!
+                $btnText.text('Account Created!');
+                var successMsg = parsed.message || (parsed.data && parsed.data.message) || 'Account created successfully!';
+                showAuthAlert(successMsg, 'success', isPage);
+                var redirectUrl = (parsed.data && parsed.data.redirect) ? parsed.data.redirect : (parsed.redirect || window.location.href);
+                setTimeout(function() {
+                  window.location.href = redirectUrl;
+                }, 600);
+                return;
+              }
+              if (parsed.message) {
+                errMsg = parsed.message;
+              } else if (parsed.data) {
+                if (typeof parsed.data === 'string') {
+                  errMsg = parsed.data;
+                } else if (parsed.data.message) {
+                  errMsg = parsed.data.message;
                 }
               }
             }
           }
-          console.error('[ShishaRent Registration Error]', { status: xhr ? xhr.status : 0, error: error, message: errMsg });
+          console.error('[ShishaRent Registration Failure]', { status: xhr ? xhr.status : 0, error: error, message: errMsg });
           showAuthAlert(errMsg, 'error', isPage);
         }
       });
