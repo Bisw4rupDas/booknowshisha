@@ -235,7 +235,7 @@ function bns_seed_pages_and_blog_posts() {
             'title'     => 'Top Trends in Luxury Event Catering & Shisha Lounges for 2026',
             'slug'      => 'top-trends-luxury-event-catering-shisha-lounges-2026',
             'category'  => 'event-services',
-            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-22%20at%208.25.41%20PM%20(1).jpeg',
+            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-22%20at%208.25.43%20PM%20(1).jpeg',
             'excerpt'   => 'From LED glow bases and ice-infused chillers to artisanal botanical mocktail pairings, discover what luxury hosts in Kolkata are requesting.',
             'content'   => '
 <p class="bns-lead-paragraph">The event hospitality industry in India is experiencing a sophisticated evolution. Private hosts and corporate event planners in Kolkata are moving away from generic setups toward curated, interactive sensory lounges. Here are the top trends shaping premium celebrations this year.</p>

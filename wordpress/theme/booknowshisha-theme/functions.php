@@ -204,8 +204,8 @@ function bns_get_contextual_blog_gallery_image($query = '') {
         if (strpos($q, 'kolkata') !== false || strpos($q, 'mobile bar') !== false) {
             return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.16.20 PM (1).jpeg');
         }
-        if (strpos($q, 'trend') !== false || strpos($q, 'luxury') !== false) {
-            return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.25.41 PM (1).jpeg');
+        if (strpos($q, 'trend') !== false || strpos($q, '2026') !== false) {
+            return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.25.43 PM (1).jpeg');
         }
         return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.16.18 PM.jpeg');
     }
