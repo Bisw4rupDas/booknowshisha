@@ -1,4 +1,4 @@
-﻿import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require('supertest');
@@ -95,6 +95,13 @@ describe('Complete ShishaRent Rental Lifecycle (E2E Integration)', () => {
     if (flavours.length >= 2) {
       flavourId1 = flavours[0].id;
       flavourId2 = flavours[1].id;
+      for (const f of flavours) {
+        await prisma.flavourStock.upsert({
+          where: { flavourId: f.id },
+          create: { flavourId: f.id, quantityUnits: 100 },
+          update: { quantityUnits: 100 },
+        });
+      }
     }
 
     const slot = await prisma.deliverySlot.findFirst({
@@ -103,10 +110,18 @@ describe('Complete ShishaRent Rental Lifecycle (E2E Integration)', () => {
     });
     if (slot) {
       deliverySlotId = slot.id;
+      await prisma.deliverySlot.update({
+        where: { id: slot.id },
+        data: { maxCapacity: 1000 },
+      });
     }
 
     // Ensure at least one available serialized unit exists for this model
     if (hookahModelId) {
+      await prisma.hookahInventory.updateMany({
+        where: { hookahModelId },
+        data: { status: HookahInventoryStatus.AVAILABLE },
+      });
       let unit = await prisma.hookahInventory.findFirst({
         where: { hookahModelId, status: HookahInventoryStatus.AVAILABLE },
       });
@@ -324,13 +339,9 @@ describe('Complete ShishaRent Rental Lifecycle (E2E Integration)', () => {
       expect(res.body).toHaveProperty('assignedUnit');
       expect(res.body.breakdown).toHaveProperty('totalToPay');
 
-      if (res.body.booking) {
-        createdBookingId = res.body.booking.id;
-        createdBookingNumber = res.body.booking.bookingNumber;
-      }
-      if (res.body.rental) {
-        createdRentalId = res.body.rental.id;
-      }
+      createdBookingId = res.body?.booking?.id || res.body?.id;
+      createdBookingNumber = res.body?.booking?.bookingNumber || res.body?.bookingNumber;
+      createdRentalId = res.body?.rental?.id;
 
       expect(createdBookingId).toBeDefined();
     });
@@ -392,7 +403,7 @@ describe('Complete ShishaRent Rental Lifecycle (E2E Integration)', () => {
 
   describe('Step 6: Rental Activation & State Machine Transitions', () => {
     it('GET /api/rentals/:id - should retrieve full rental details', async () => {
-      if (!createdRentalId) {
+      if (!createdRentalId && createdBookingId) {
         const booking = await prisma.booking.findUnique({
           where: { id: createdBookingId },
           include: { rental: true },
