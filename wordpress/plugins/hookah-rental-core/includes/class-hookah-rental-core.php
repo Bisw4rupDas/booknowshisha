@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * The core plugin class orchestrating hooks and loader.
  *

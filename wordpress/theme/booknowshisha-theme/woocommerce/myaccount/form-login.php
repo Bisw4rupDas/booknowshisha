@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Customer Email Authentication Form Template Override for WooCommerce
  * Exclusively Kolkata / India - Email-Only Authentication

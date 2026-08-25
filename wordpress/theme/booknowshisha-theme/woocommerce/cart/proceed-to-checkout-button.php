@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Proceed to checkout button for BookMySmoke / ShishaRent
  *

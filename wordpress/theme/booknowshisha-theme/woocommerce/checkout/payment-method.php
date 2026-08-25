@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Output a single payment method for BookMySmoke / ShishaRent
  *

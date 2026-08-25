@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Checkout Payment Section Template for BookMySmoke / ShishaRent
  *

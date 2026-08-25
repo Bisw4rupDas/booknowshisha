@@ -298,8 +298,8 @@
         return;
       }
 
-      if (!emailVal || emailVal.indexOf('@') === -1) {
-        showAuthAlert('Please enter a valid email address.', 'error', isPage);
+      if (!emailVal || emailVal.indexOf('@') === -1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        showAuthAlert('Please enter a valid email address (e.g. user@gmail.com).', 'error', isPage);
         return;
       }
 
@@ -337,7 +337,14 @@
         data: dataObj,
         success: function(res) {
           if (typeof res === 'string') {
-            try { res = JSON.parse(res); } catch(e) {}
+            try {
+              res = JSON.parse(res);
+            } catch(e) {
+              var jsonMatch = res.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                try { res = JSON.parse(jsonMatch[0]); } catch(e2) {}
+              }
+            }
           }
           if (res && res.success) {
             $btnText.text('Account Created!');
@@ -378,27 +385,54 @@
           $btn.prop('disabled', false).removeClass('is-loading');
           $btnText.text(origText);
           var errMsg = 'Could not create account. Please try again.';
+          
           if (xhr) {
-            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-              errMsg = xhr.responseJSON.data.message;
+            if (xhr.responseJSON) {
+              if (xhr.responseJSON.data) {
+                if (typeof xhr.responseJSON.data === 'string') {
+                  errMsg = xhr.responseJSON.data;
+                } else if (xhr.responseJSON.data.message) {
+                  errMsg = xhr.responseJSON.data.message;
+                }
+              } else if (xhr.responseJSON.message) {
+                errMsg = xhr.responseJSON.message;
+              }
             } else if (xhr.responseText) {
               try {
                 var parsed = JSON.parse(xhr.responseText);
-                if (parsed && parsed.data && parsed.data.message) {
+                if (parsed.success && parsed.data) {
+                  $btnText.text('Account Created!');
+                  showAuthAlert(parsed.data.message || 'Account created successfully!', 'success', isPage);
+                  setTimeout(function() {
+                    window.location.href = parsed.data.redirect || window.location.href;
+                  }, 600);
+                  return;
+                } else if (parsed.data && parsed.data.message) {
                   errMsg = parsed.data.message;
-                } else if (parsed && parsed.message) {
+                } else if (parsed.message) {
                   errMsg = parsed.message;
                 }
               } catch(e) {
-                if (xhr.status === 400 || xhr.responseText === '0') {
-                  errMsg = 'An account with this email may already exist, or security token expired. Please try signing in.';
-                } else {
-                  errMsg = 'Server responded with error (' + xhr.status + '). Please try again.';
+                var jsonMatch = xhr.responseText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                  try {
+                    var parsed2 = JSON.parse(jsonMatch[0]);
+                    if (parsed2.success && parsed2.data) {
+                      $btnText.text('Account Created!');
+                      showAuthAlert(parsed2.data.message || 'Account created successfully!', 'success', isPage);
+                      setTimeout(function() {
+                        window.location.href = parsed2.data.redirect || window.location.href;
+                      }, 600);
+                      return;
+                    } else if (parsed2.data && parsed2.data.message) {
+                      errMsg = parsed2.data.message;
+                    }
+                  } catch(e3) {}
                 }
               }
             }
           }
-          console.error('[ShishaRent Registration Network/Server Error]', { status: xhr ? xhr.status : 0, responseText: xhr ? xhr.responseText : '', error: error });
+          console.error('[ShishaRent Registration Error]', { status: xhr ? xhr.status : 0, error: error, message: errMsg });
           showAuthAlert(errMsg, 'error', isPage);
         }
       });

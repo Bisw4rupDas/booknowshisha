@@ -192,6 +192,25 @@ function bns_get_product_image_url($product_id, $size = 'woocommerce_thumbnail')
  * Image helper for Blog Posts
  */
 /**
+ * Direct exact mapping for known core articles to ensure 100% distinct photos
+ */
+function bns_get_core_blog_image_by_slug($slug) {
+    $gallery_base = get_template_directory_uri() . '/shisharent-gallery/';
+    $exact_map = [
+        'how-to-choose-the-right-hookah-for-a-party'           => 'WhatsApp Image 2026-08-22 at 8.16.18 PM.jpeg',
+        'best-hookah-flavours-for-different-occasions'         => 'WhatsApp Image 2026-08-23 at 10.59.18 AM (1).jpeg',
+        'how-to-set-up-a-hookah-at-home-smooth-draw'           => 'WhatsApp Image 2026-08-22 at 7.16.12 PM (1).jpeg',
+        'planning-hookah-mobile-bar-party-kolkata'             => 'WhatsApp Image 2026-08-22 at 8.16.20 PM (1).jpeg',
+        'hookah-care-cleaning-hygiene-standards'               => 'WhatsApp Image 2026-08-22 at 7.16.17 PM (1).jpeg',
+        'top-trends-luxury-event-catering-shisha-lounges-2026' => 'WhatsApp Image 2026-08-22 at 8.25.43 PM (1).jpeg',
+    ];
+    if (isset($exact_map[$slug])) {
+        return $gallery_base . rawurlencode($exact_map[$slug]);
+    }
+    return false;
+}
+
+/**
  * Contextual Gallery Image Mapper for Blog Articles & Services
  * Maps article keywords/topics to verified high-res photos in shisharent-gallery
  */
@@ -200,13 +219,13 @@ function bns_get_contextual_blog_gallery_image($query = '') {
     $q = strtolower($query);
 
     // 1. Party / Event / Mobile Bar / Catering / Celebration
-    if (strpos($q, 'party') !== false || strpos($q, 'event') !== false || strpos($q, 'catering') !== false || strpos($q, 'celebrat') !== false || strpos($q, 'mobile-bar') !== false || strpos($q, 'bartend') !== false || strpos($q, 'lounge') !== false) {
-        if (strpos($q, 'kolkata') !== false || strpos($q, 'mobile bar') !== false) {
-            return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.16.20 PM (1).jpeg');
-        }
-        if (strpos($q, 'trend') !== false || strpos($q, '2026') !== false) {
-            return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.25.43 PM (1).jpeg');
-        }
+    if (strpos($q, 'trend') !== false || strpos($q, '2026') !== false || strpos($q, 'lounge') !== false) {
+        return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.25.43 PM (1).jpeg');
+    }
+    if (strpos($q, 'kolkata') !== false || strpos($q, 'mobile bar') !== false || strpos($q, 'bartend') !== false) {
+        return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.16.20 PM (1).jpeg');
+    }
+    if (strpos($q, 'party') !== false || strpos($q, 'event') !== false || strpos($q, 'celebrat') !== false) {
         return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.16.18 PM.jpeg');
     }
 
@@ -238,6 +257,17 @@ function bns_get_contextual_blog_gallery_image($query = '') {
  * Image helper for Blog Posts - seamlessly uses contextual ShishaRent Gallery photos
  */
 function bns_get_post_image_url($post_id, $size = 'large') {
+    $post = get_post($post_id);
+    $slug = $post ? $post->post_name : '';
+
+    // Direct core article mapping check
+    if ($slug) {
+        $core_img = bns_get_core_blog_image_by_slug($slug);
+        if ($core_img) {
+            return $core_img;
+        }
+    }
+
     if (has_post_thumbnail($post_id)) {
         $img = get_the_post_thumbnail_url($post_id, $size);
         if ($img) {
@@ -249,17 +279,13 @@ function bns_get_post_image_url($post_id, $size = 'large') {
     if ($meta_img) {
         // If meta_img is an external placeholder like unsplash, resolve to contextual gallery image!
         if (strpos($meta_img, 'unsplash.com') !== false) {
-            $post = get_post($post_id);
             $title = $post ? strtolower($post->post_title) : '';
-            $slug = $post ? $post->post_name : '';
             return bns_get_contextual_blog_gallery_image($slug . ' ' . $title);
         }
         return $meta_img;
     }
 
     // Contextual fallback by post title/slug
-    $post = get_post($post_id);
-    $slug = $post ? $post->post_name : '';
     $title = $post ? $post->post_title : '';
     return bns_get_contextual_blog_gallery_image($slug . ' ' . $title);
 }
@@ -1246,17 +1272,33 @@ add_action('woocommerce_checkout_update_order_meta', function($order_id) {
 /**
  * ==========================================================================
  * SHISHARENT UNIFIED CUSTOMER AUTHENTICATION & SERVICEABILITY AJAX HANDLERS
+ * Clean JSON responses with strict output buffer clearing and error codes
  * ==========================================================================
  */
+
+/**
+ * Helper to ensure clean JSON output without pre-existing warnings or whitespace
+ */
+function bns_send_clean_json($success, $data, $status_code = null) {
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    if (!headers_sent()) {
+        header('Content-Type: application/json; charset=UTF-8');
+        header('X-Content-Type-Options: nosniff');
+    }
+    if ($success) {
+        wp_send_json_success($data, $status_code ?: 200);
+    } else {
+        wp_send_json_error($data, $status_code ?: 400);
+    }
+    exit;
+}
 
 /**
  * AJAX: Customer Email Registration
  */
 function bns_ajax_email_register() {
-    if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
-        error_log('[ShishaRent Auth] Nonce verification note: proceeding with sanitized input');
-    }
-
     $name             = isset($_POST['name']) ? sanitize_text_field(trim($_POST['name'])) : '';
     $email            = isset($_POST['email']) ? sanitize_email(trim($_POST['email'])) : '';
     $password         = isset($_POST['password']) ? trim($_POST['password']) : '';
@@ -1264,32 +1306,31 @@ function bns_ajax_email_register() {
     $redirect         = isset($_POST['redirect']) ? esc_url_raw($_POST['redirect']) : '';
 
     if (empty($name)) {
-        wp_send_json_error(['message' => __('Please enter your full name.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Please enter your full name.', 'shisharent')], 400);
     }
 
     if (empty($email) || !is_email($email)) {
-        wp_send_json_error(['message' => __('Please enter a valid email address (e.g. user@gmail.com).', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Please enter a valid email address (e.g. user@gmail.com).', 'shisharent')], 400);
     }
 
     $normalized_email = strtolower($email);
 
     if (email_exists($normalized_email) || username_exists($normalized_email)) {
-        error_log('[ShishaRent Auth] Account exists check failed for: ' . $normalized_email);
-        wp_send_json_error([
+        bns_send_clean_json(false, [
             'message' => __('An account with this email address already exists. Please sign in or reset your password.', 'shisharent'),
-        ]);
+        ], 400);
     }
 
     if (empty($password)) {
-        wp_send_json_error(['message' => __('Please choose a password.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Please choose a password.', 'shisharent')], 400);
     }
 
     if (strlen($password) < 8) {
-        wp_send_json_error(['message' => __('Password must be at least 8 characters long.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Password must be at least 8 characters long.', 'shisharent')], 400);
     }
 
     if ($password !== $confirm_password) {
-        wp_send_json_error(['message' => __('Passwords do not match. Please re-enter your confirm password.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Passwords do not match. Please re-enter your confirm password.', 'shisharent')], 400);
     }
 
     // Split Full Name into First & Last Name
@@ -1332,10 +1373,10 @@ function bns_ajax_email_register() {
 
     if (is_wp_error($user_id)) {
         error_log('[ShishaRent Registration Error] ' . $user_id->get_error_message());
-        wp_send_json_error([
+        bns_send_clean_json(false, [
             'message' => $user_id->get_error_message(),
             'code'    => $user_id->get_error_code(),
-        ]);
+        ], 400);
     }
 
     // Update customer billing and name metadata
@@ -1356,7 +1397,7 @@ function bns_ajax_email_register() {
             do_action('wp_login', $user->user_login, $user);
         }
     } catch (\Throwable $e) {
-        error_log('[ShishaRent Auth] Login session error: ' . $e->getMessage());
+        error_log('[ShishaRent Auth] Login session note: ' . $e->getMessage());
     }
 
     // Synchronize WooCommerce Customer Session
@@ -1369,7 +1410,7 @@ function bns_ajax_email_register() {
             WC()->customer = new WC_Customer($user_id, true);
         }
     } catch (\Throwable $e) {
-        error_log('[ShishaRent Auth] WC session error: ' . $e->getMessage());
+        error_log('[ShishaRent Auth] WC session note: ' . $e->getMessage());
     }
 
     $final_redirect = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
@@ -1377,9 +1418,7 @@ function bns_ajax_email_register() {
         $final_redirect = $redirect;
     }
 
-    error_log('[ShishaRent Registration Success] New User ID: ' . $user_id . ' Email: ' . $normalized_email);
-
-    wp_send_json_success([
+    bns_send_clean_json(true, [
         'message'     => __('Account created successfully! Welcome to ShishaRent.', 'shisharent'),
         'redirect'    => $final_redirect,
         'is_new_user' => true,
@@ -1388,7 +1427,7 @@ function bns_ajax_email_register() {
             'name'  => $display_name,
             'email' => $normalized_email,
         ],
-    ]);
+    ], 200);
 }
 add_action('wp_ajax_bns_email_register', 'bns_ajax_email_register');
 add_action('wp_ajax_nopriv_bns_email_register', 'bns_ajax_email_register');
@@ -1397,21 +1436,17 @@ add_action('wp_ajax_nopriv_bns_email_register', 'bns_ajax_email_register');
  * AJAX: Customer Email Login
  */
 function bns_ajax_email_login() {
-    if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
-        // Nonce check - non-fatal fallback
-    }
-
     $login_input = isset($_POST['email']) ? trim($_POST['email']) : (isset($_POST['user_login']) ? trim($_POST['user_login']) : '');
     $password    = isset($_POST['password']) ? trim($_POST['password']) : '';
     $remember    = !empty($_POST['remember']);
     $redirect    = isset($_POST['redirect']) ? esc_url_raw($_POST['redirect']) : '';
 
     if (empty($login_input)) {
-        wp_send_json_error(['message' => __('Please enter your email address.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Please enter your email address.', 'shisharent')], 400);
     }
 
     if (empty($password)) {
-        wp_send_json_error(['message' => __('Please enter your password.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Please enter your password.', 'shisharent')], 400);
     }
 
     $user_to_auth = $login_input;
@@ -1425,7 +1460,7 @@ function bns_ajax_email_login() {
     $user = wp_authenticate($user_to_auth, $password);
 
     if (is_wp_error($user)) {
-        wp_send_json_error(['message' => __('Incorrect email or password. Please try again.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Incorrect email or password. Please try again.', 'shisharent')], 400);
     }
 
     try {
@@ -1438,7 +1473,7 @@ function bns_ajax_email_login() {
             WC()->customer = new WC_Customer($user->ID, true);
         }
     } catch (\Throwable $e) {
-        error_log('[ShishaRent Auth] Login error: ' . $e->getMessage());
+        error_log('[ShishaRent Auth] Login note: ' . $e->getMessage());
     }
 
     $final_redirect = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
@@ -1448,7 +1483,7 @@ function bns_ajax_email_login() {
 
     $display_name = $user->display_name ?: ($user->first_name ? $user->first_name . ' ' . $user->last_name : $user->user_login);
 
-    wp_send_json_success([
+    bns_send_clean_json(true, [
         'message'  => sprintf(__('Welcome back, %s!', 'shisharent'), esc_html($display_name)),
         'redirect' => $final_redirect,
         'user'     => [
@@ -1456,7 +1491,7 @@ function bns_ajax_email_login() {
             'name'  => $display_name,
             'email' => $user->user_email,
         ],
-    ]);
+    ], 200);
 }
 add_action('wp_ajax_bns_email_login', 'bns_ajax_email_login');
 add_action('wp_ajax_nopriv_bns_email_login', 'bns_ajax_email_login');
@@ -1467,7 +1502,7 @@ add_action('wp_ajax_nopriv_bns_email_login', 'bns_ajax_email_login');
 function bns_ajax_forgot_password() {
     $email = isset($_POST['email']) ? sanitize_email(trim($_POST['email'])) : '';
     if (empty($email) || !is_email($email)) {
-        wp_send_json_error(['message' => __('Please enter a valid email address.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Please enter a valid email address.', 'shisharent')], 400);
     }
 
     $user = get_user_by('email', strtolower($email));
@@ -1496,13 +1531,13 @@ If this was a mistake, you can safely ignore this email.", 'shisharent'),
                 @wp_mail($user->user_email, $subject, $body);
             }
         } catch (\Throwable $e) {
-            error_log('[ShishaRent Auth] Forgot password error: ' . $e->getMessage());
+            error_log('[ShishaRent Auth] Forgot password note: ' . $e->getMessage());
         }
     }
 
-    wp_send_json_success([
+    bns_send_clean_json(true, [
         'message' => __('If that email address is registered with us, a password reset link has been sent.', 'shisharent'),
-    ]);
+    ], 200);
 }
 add_action('wp_ajax_bns_forgot_password', 'bns_ajax_forgot_password');
 add_action('wp_ajax_nopriv_bns_forgot_password', 'bns_ajax_forgot_password');
@@ -1514,10 +1549,10 @@ function bns_ajax_customer_logout() {
     wp_destroy_current_session();
     wp_clear_auth_cookie();
     wp_set_current_user(0);
-    wp_send_json_success([
+    bns_send_clean_json(true, [
         'message'  => __('Logged out successfully.', 'shisharent'),
         'redirect' => home_url('/'),
-    ]);
+    ], 200);
 }
 add_action('wp_ajax_bns_customer_logout', 'bns_ajax_customer_logout');
 add_action('wp_ajax_nopriv_bns_customer_logout', 'bns_ajax_customer_logout');
@@ -1528,22 +1563,22 @@ add_action('wp_ajax_nopriv_bns_customer_logout', 'bns_ajax_customer_logout');
 function bns_ajax_check_availability() {
     $postal_code = isset($_POST['postal_code']) ? sanitize_text_field(trim($_POST['postal_code'])) : '';
     if (empty($postal_code)) {
-        wp_send_json_error(['message' => __('Please enter a 6-digit PIN code.', 'shisharent')]);
+        bns_send_clean_json(false, ['message' => __('Please enter a 6-digit PIN code.', 'shisharent')], 400);
     }
 
     if (class_exists('Hookah_Serviceability')) {
         $result = Hookah_Serviceability::check_pin_serviceability($postal_code);
-        wp_send_json_success($result);
+        bns_send_clean_json(true, $result, 200);
     } else {
         $clean_pin = preg_replace('/[^0-9]/', '', $postal_code);
         if (strlen($clean_pin) !== 6) {
-            wp_send_json_error(['message' => __('Invalid PIN format. Please enter a 6-digit PIN.', 'shisharent')]);
+            bns_send_clean_json(false, ['message' => __('Invalid PIN format. Please enter a 6-digit PIN.', 'shisharent')], 400);
         }
         $is_kolkata = (strpos($clean_pin, '700') === 0);
         $is_24p     = (strpos($clean_pin, '743') === 0);
         if ($is_kolkata || $is_24p) {
             $district = $is_kolkata ? 'Kolkata' : 'North 24 Parganas';
-            wp_send_json_success([
+            bns_send_clean_json(true, [
                 'deliverable'      => true,
                 'serviceable'      => true,
                 'pin'              => $clean_pin,
@@ -1558,14 +1593,14 @@ function bns_ajax_check_availability() {
                     ['id' => 'slot_18_21', 'timeWindow' => '06:00 PM – 09:00 PM (Night Party Express)'],
                     ['id' => 'slot_21_00', 'timeWindow' => '09:00 PM – 12:00 AM (Late Night VIP)'],
                 ],
-            ]);
+            ], 200);
         } else {
-            wp_send_json_success([
+            bns_send_clean_json(true, [
                 'deliverable'      => false,
                 'serviceable'      => false,
                 'pin'              => $clean_pin,
                 'message'          => sprintf(__('Delivery not available for PIN %s. ShishaRent currently delivers exclusively within Kolkata, North 24 Parganas and South 24 Parganas.', 'shisharent'), $clean_pin),
-            ]);
+            ], 200);
         }
     }
 }

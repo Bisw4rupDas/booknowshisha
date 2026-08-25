@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Customer Email Authentication System (Login, Sign-Up, Forgot Password)
  * Exclusively Email/Password Authentication for BookNowShisha / ShishaRent
@@ -11,6 +11,25 @@ if (!defined('ABSPATH')) {
 }
 
 class Hookah_Email_Auth {
+    /**
+     * Send clean JSON response without premature output or headers issues
+     */
+    private function send_clean_json($success, $data, $status_code = null) {
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=UTF-8');
+            header('X-Content-Type-Options: nosniff');
+        }
+        if ($success) {
+            $this->send_clean_json(true, $data, $status_code ?: 200);
+        } else {
+            $this->send_clean_json(false, $data, $status_code ?: 400);
+        }
+        exit;
+    }
+
 
     public function __construct() {
         // AJAX Endpoints for Customer Email Login
@@ -43,7 +62,7 @@ class Hookah_Email_Auth {
     public function ajax_email_login() {
         // CSRF Check (Permissive if nonce not passed, strict if passed)
         if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Security token expired. Please refresh the page and try again.', 'hookah-rental-core'),
             ]);
         }
@@ -54,13 +73,13 @@ class Hookah_Email_Auth {
         $redirect    = isset($_POST['redirect']) ? esc_url_raw($_POST['redirect']) : '';
 
         if (empty($login_input)) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Please enter your email address.', 'hookah-rental-core'),
             ]);
         }
 
         if (empty($password)) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Please enter your password.', 'hookah-rental-core'),
             ]);
         }
@@ -85,14 +104,14 @@ class Hookah_Email_Auth {
                 $error_message = __('Please provide both email address and password.', 'hookah-rental-core');
             }
 
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => $error_message,
             ]);
         }
 
         // Check if user is active
         if (isset($user->user_status) && $user->user_status != 0) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Your account has been deactivated. Please contact customer support.', 'hookah-rental-core'),
             ]);
         }
@@ -117,7 +136,7 @@ class Hookah_Email_Auth {
 
         $display_name = $user->display_name ?: ($user->first_name ? $user->first_name . ' ' . $user->last_name : $user->user_login);
 
-        wp_send_json_success([
+        $this->send_clean_json(true, [
             'message'  => sprintf(__('Welcome back, %s!', 'hookah-rental-core'), esc_html($display_name)),
             'redirect' => $final_redirect,
             'user'     => [
@@ -133,7 +152,7 @@ class Hookah_Email_Auth {
      */
     public function ajax_email_register() {
         if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Security token expired. Please refresh the page and try again.', 'hookah-rental-core'),
             ]);
         }
@@ -146,13 +165,13 @@ class Hookah_Email_Auth {
 
         // Validation: Required fields
         if (empty($name)) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Please enter your full name.', 'hookah-rental-core'),
             ]);
         }
 
         if (empty($email) || !is_email($email)) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Please enter a valid email address.', 'hookah-rental-core'),
             ]);
         }
@@ -160,25 +179,25 @@ class Hookah_Email_Auth {
         // AIRTIGHT DUPLICATE EMAIL PREVENTION
         $normalized_email = strtolower($email);
         if (email_exists($normalized_email) || get_user_by('email', $normalized_email) || username_exists($normalized_email)) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('An account with this email address already exists. Please sign in or reset your password.', 'hookah-rental-core'),
             ]);
         }
 
         if (empty($password)) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Please choose a password.', 'hookah-rental-core'),
             ]);
         }
 
         if (strlen($password) < 8) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Password must be at least 8 characters long.', 'hookah-rental-core'),
             ]);
         }
 
         if ($password !== $confirm_password) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Passwords do not match. Please re-enter your confirm password.', 'hookah-rental-core'),
             ]);
         }
@@ -223,7 +242,7 @@ class Hookah_Email_Auth {
 
         if (is_wp_error($user_id)) {
             error_log('[ShishaRent Registration Error] ' . $user_id->get_error_message());
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => $user_id->get_error_message(),
                 'code'    => $user_id->get_error_code(),
             ]);
@@ -277,7 +296,7 @@ class Hookah_Email_Auth {
             $final_redirect = $redirect;
         }
 
-        wp_send_json_success([
+        $this->send_clean_json(true, [
             'message'     => __('Account created successfully! Welcome to ShishaRent.', 'hookah-rental-core'),
             'redirect'    => $final_redirect,
             'is_new_user' => true,
@@ -294,7 +313,7 @@ class Hookah_Email_Auth {
      */
     public function ajax_forgot_password() {
         if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Security token expired. Please refresh the page and try again.', 'hookah-rental-core'),
             ]);
         }
@@ -302,7 +321,7 @@ class Hookah_Email_Auth {
         $email = isset($_POST['email']) ? sanitize_email(trim($_POST['email'])) : '';
 
         if (empty($email) || !is_email($email)) {
-            wp_send_json_error([
+            $this->send_clean_json(false, [
                 'message' => __('Please enter a valid email address.', 'hookah-rental-core'),
             ]);
         }
@@ -342,7 +361,7 @@ class Hookah_Email_Auth {
         }
 
         // Generic response for security
-        wp_send_json_success([
+        $this->send_clean_json(true, [
             'message' => __('If that email is registered, a password reset link has been sent to your inbox. Please check your inbox and spam folder.', 'hookah-rental-core'),
         ]);
     }
@@ -366,7 +385,7 @@ class Hookah_Email_Auth {
      */
     public function ajax_customer_logout() {
         wp_logout();
-        wp_send_json_success([
+        $this->send_clean_json(true, [
             'message'  => __('Logged out successfully.', 'hookah-rental-core'),
             'redirect' => home_url(),
         ]);

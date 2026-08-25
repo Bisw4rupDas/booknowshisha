@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Empty Cart Page Template for BookMySmoke / ShishaRent
  *

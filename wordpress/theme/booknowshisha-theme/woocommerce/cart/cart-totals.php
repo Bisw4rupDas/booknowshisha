@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Cart Totals Summary Card Template for BookMySmoke / ShishaRent
  *

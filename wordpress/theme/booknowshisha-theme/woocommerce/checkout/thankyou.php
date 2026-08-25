@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Thankyou (Order Received) Template for BookMySmoke / ShishaRent
  *

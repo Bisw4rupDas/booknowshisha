@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Template Name: Checkout Page
  * Template for BookNowShisha / BookMySmoke Checkout

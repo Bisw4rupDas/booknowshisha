@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Template Name: Cart Page
  * Template for BookNowShisha / BookMySmoke Cart

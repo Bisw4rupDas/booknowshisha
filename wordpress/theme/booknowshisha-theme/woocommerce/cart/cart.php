@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Cart Page Template for BookMySmoke / ShishaRent
  * Premium Luxury 2-Column Responsive Cart Experience
