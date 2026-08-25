@@ -328,6 +328,8 @@
       }
       dataObj.redirect = window.location.href;
 
+      console.log('[ShishaRent Auth] Submitting registration for:', emailVal);
+
       $.ajax({
         url: ajaxEndpoint,
         type: 'POST',
@@ -339,9 +341,10 @@
           }
           if (res && res.success) {
             $btnText.text('Account Created!');
-            showAuthAlert(res.data.message || 'Account created successfully!', 'success', isPage);
+            var successMsg = (res.data && res.data.message) ? res.data.message : 'Account created successfully! Welcome to ShishaRent.';
+            showAuthAlert(successMsg, 'success', isPage);
             if (typeof showToast === 'function') {
-              showToast('Account Created', res.data.message || 'Welcome to ShishaRent!', 'success');
+              showToast('Account Created', successMsg, 'success');
             }
             setTimeout(function() {
               if (res.data && res.data.redirect) {
@@ -349,15 +352,29 @@
               } else {
                 location.reload();
               }
-            }, 500);
+            }, 600);
           } else {
             $btn.prop('disabled', false).removeClass('is-loading');
             $btnText.text(origText);
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not create account. Please try again.';
+            var errMsg = 'Could not create account. Please try again.';
+            if (res) {
+              if (res.data) {
+                if (typeof res.data === 'string') {
+                  errMsg = res.data;
+                } else if (res.data.message) {
+                  errMsg = res.data.message;
+                } else if (res.data.error) {
+                  errMsg = res.data.error;
+                }
+              } else if (res.message) {
+                errMsg = res.message;
+              }
+            }
+            console.error('[ShishaRent Registration Error]', { response: res, errorMessage: errMsg });
             showAuthAlert(errMsg, 'error', isPage);
           }
         },
-        error: function(xhr) {
+        error: function(xhr, status, error) {
           $btn.prop('disabled', false).removeClass('is-loading');
           $btnText.text(origText);
           var errMsg = 'Could not create account. Please try again.';
@@ -374,11 +391,14 @@
                 }
               } catch(e) {
                 if (xhr.status === 400 || xhr.responseText === '0') {
-                  errMsg = 'An account with this email may already exist, or the security session expired. Please sign in.';
+                  errMsg = 'An account with this email may already exist, or security token expired. Please try signing in.';
+                } else {
+                  errMsg = 'Server responded with error (' + xhr.status + '). Please try again.';
                 }
               }
             }
           }
+          console.error('[ShishaRent Registration Network/Server Error]', { status: xhr ? xhr.status : 0, responseText: xhr ? xhr.responseText : '', error: error });
           showAuthAlert(errMsg, 'error', isPage);
         }
       });

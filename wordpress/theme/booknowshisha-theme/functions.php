@@ -99,6 +99,9 @@ function bns_maybe_seed_content() {
         if (function_exists('bns_seed_pages_and_blog_posts')) {
             bns_seed_pages_and_blog_posts();
         }
+        if (function_exists('bns_sync_blog_posts_with_gallery')) {
+            bns_sync_blog_posts_with_gallery();
+        }
     }
 }
 add_action('init', 'bns_maybe_seed_content', 20);
@@ -188,6 +191,52 @@ function bns_get_product_image_url($product_id, $size = 'woocommerce_thumbnail')
 /**
  * Image helper for Blog Posts
  */
+/**
+ * Contextual Gallery Image Mapper for Blog Articles & Services
+ * Maps article keywords/topics to verified high-res photos in shisharent-gallery
+ */
+function bns_get_contextual_blog_gallery_image($query = '') {
+    $gallery_base = get_template_directory_uri() . '/shisharent-gallery/';
+    $q = strtolower($query);
+
+    // 1. Party / Event / Mobile Bar / Catering / Celebration
+    if (strpos($q, 'party') !== false || strpos($q, 'event') !== false || strpos($q, 'catering') !== false || strpos($q, 'celebrat') !== false || strpos($q, 'mobile-bar') !== false || strpos($q, 'bartend') !== false || strpos($q, 'lounge') !== false) {
+        if (strpos($q, 'kolkata') !== false || strpos($q, 'mobile bar') !== false) {
+            return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.16.20 PM (1).jpeg');
+        }
+        if (strpos($q, 'trend') !== false || strpos($q, 'luxury') !== false) {
+            return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.25.41 PM (1).jpeg');
+        }
+        return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 8.16.18 PM.jpeg');
+    }
+
+    // 2. Flavour / Mixology / Molasses / Bowl / Connoisseur / Chillum
+    if (strpos($q, 'flavour') !== false || strpos($q, 'flavor') !== false || strpos($q, 'mixolog') !== false || strpos($q, 'molasses') !== false || strpos($q, 'tobacco') !== false || strpos($q, 'blend') !== false || strpos($q, 'chillum') !== false) {
+        return $gallery_base . rawurlencode('WhatsApp Image 2026-08-23 at 10.59.18 AM (1).jpeg');
+    }
+
+    // 3. Setup / Cloud Density / Home / Hardware / Airflow / Burner
+    if (strpos($q, 'setup') !== false || strpos($q, 'cloud') !== false || strpos($q, 'home') !== false || strpos($q, 'draw') !== false || strpos($q, 'coal') !== false || strpos($q, 'burner') !== false) {
+        return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 7.16.12 PM (1).jpeg');
+    }
+
+    // 4. Care / Cleaning / Hygiene / Sanitization / Hoses / Maintenance
+    if (strpos($q, 'clean') !== false || strpos($q, 'hygiene') !== false || strpos($q, 'care') !== false || strpos($q, 'sanit') !== false || strpos($q, 'mouthpiece') !== false || strpos($q, 'hose') !== false) {
+        return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 7.16.17 PM (1).jpeg');
+    }
+
+    // 5. Hookah / Rental / Stems / Pipes
+    if (strpos($q, 'rental') !== false || strpos($q, 'hookah') !== false || strpos($q, 'shisha') !== false || strpos($q, 'pipe') !== false) {
+        return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 7.16.13 PM.jpeg');
+    }
+
+    // Default premium event gallery fallback
+    return $gallery_base . rawurlencode('WhatsApp Image 2026-08-22 at 7.56.14 PM.jpeg');
+}
+
+/**
+ * Image helper for Blog Posts - seamlessly uses contextual ShishaRent Gallery photos
+ */
 function bns_get_post_image_url($post_id, $size = 'large') {
     if (has_post_thumbnail($post_id)) {
         $img = get_the_post_thumbnail_url($post_id, $size);
@@ -198,10 +247,21 @@ function bns_get_post_image_url($post_id, $size = 'large') {
 
     $meta_img = get_post_meta($post_id, '_bns_image_url', true);
     if ($meta_img) {
+        // If meta_img is an external placeholder like unsplash, resolve to contextual gallery image!
+        if (strpos($meta_img, 'unsplash.com') !== false) {
+            $post = get_post($post_id);
+            $title = $post ? strtolower($post->post_title) : '';
+            $slug = $post ? $post->post_name : '';
+            return bns_get_contextual_blog_gallery_image($slug . ' ' . $title);
+        }
         return $meta_img;
     }
 
-    return get_template_directory_uri() . '/assets/images/logo.png';
+    // Contextual fallback by post title/slug
+    $post = get_post($post_id);
+    $slug = $post ? $post->post_name : '';
+    $title = $post ? $post->post_title : '';
+    return bns_get_contextual_blog_gallery_image($slug . ' ' . $title);
 }
 
 /**
@@ -1194,7 +1254,7 @@ add_action('woocommerce_checkout_update_order_meta', function($order_id) {
  */
 function bns_ajax_email_register() {
     if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
-        // Nonce check - non-fatal fallback
+        error_log('[ShishaRent Auth] Nonce verification note: proceeding with sanitized input');
     }
 
     $name             = isset($_POST['name']) ? sanitize_text_field(trim($_POST['name'])) : '';
@@ -1208,12 +1268,13 @@ function bns_ajax_email_register() {
     }
 
     if (empty($email) || !is_email($email)) {
-        wp_send_json_error(['message' => __('Please enter a valid email address.', 'shisharent')]);
+        wp_send_json_error(['message' => __('Please enter a valid email address (e.g. user@gmail.com).', 'shisharent')]);
     }
 
     $normalized_email = strtolower($email);
 
     if (email_exists($normalized_email) || username_exists($normalized_email)) {
+        error_log('[ShishaRent Auth] Account exists check failed for: ' . $normalized_email);
         wp_send_json_error([
             'message' => __('An account with this email address already exists. Please sign in or reset your password.', 'shisharent'),
         ]);
@@ -1237,9 +1298,9 @@ function bns_ajax_email_register() {
     $last_name    = isset($name_parts[1]) ? sanitize_text_field($name_parts[1]) : '';
     $display_name = $name;
 
-    // Generate unique username from email
+    // Generate clean username from email prefix
     $base_username = sanitize_user(strstr($normalized_email, '@', true), true);
-    if (empty($base_username)) {
+    if (empty($base_username) || strlen($base_username) < 3) {
         $base_username = 'customer_' . substr(md5($normalized_email . microtime()), 0, 8);
     }
     $username = $base_username;
@@ -1249,22 +1310,40 @@ function bns_ajax_email_register() {
         $counter++;
     }
 
-    // Create WordPress Customer Account
-    $user_id = wp_insert_user([
-        'user_login'   => $username,
-        'user_email'   => $normalized_email,
-        'user_pass'    => $password,
-        'first_name'   => $first_name,
-        'last_name'    => $last_name,
-        'display_name' => $display_name,
-        'role'         => 'customer',
-    ]);
-
-    if (is_wp_error($user_id)) {
-        wp_send_json_error([
-            'message' => __('Could not create account: ', 'shisharent') . $user_id->get_error_message(),
+    // Create user via WooCommerce helper or native wp_insert_user
+    if (function_exists('wc_create_new_customer')) {
+        $user_id = wc_create_new_customer($normalized_email, $username, $password, [
+            'first_name'   => $first_name,
+            'last_name'    => $last_name,
+            'display_name' => $display_name,
+            'role'         => 'customer',
+        ]);
+    } else {
+        $user_id = wp_insert_user([
+            'user_login'   => $username,
+            'user_email'   => $normalized_email,
+            'user_pass'    => $password,
+            'first_name'   => $first_name,
+            'last_name'    => $last_name,
+            'display_name' => $display_name,
+            'role'         => 'customer',
         ]);
     }
+
+    if (is_wp_error($user_id)) {
+        error_log('[ShishaRent Registration Error] ' . $user_id->get_error_message());
+        wp_send_json_error([
+            'message' => $user_id->get_error_message(),
+            'code'    => $user_id->get_error_code(),
+        ]);
+    }
+
+    // Update customer billing and name metadata
+    update_user_meta($user_id, 'first_name', $first_name);
+    update_user_meta($user_id, 'last_name', $last_name);
+    update_user_meta($user_id, 'billing_first_name', $first_name);
+    update_user_meta($user_id, 'billing_last_name', $last_name);
+    update_user_meta($user_id, 'billing_email', $normalized_email);
 
     $user = get_user_by('id', $user_id);
 
@@ -1280,26 +1359,25 @@ function bns_ajax_email_register() {
         error_log('[ShishaRent Auth] Login session error: ' . $e->getMessage());
     }
 
-    // Fire WooCommerce hooks safely without fatal mail blocking
+    // Synchronize WooCommerce Customer Session
     try {
-        if (function_exists('wc_get_page_permalink')) {
-            do_action('woocommerce_created_customer', $user_id, [
-                'user_email' => $normalized_email,
-                'user_pass'  => $password,
-            ], false);
+        if (function_exists('wc_set_customer_auth_cookie')) {
+            wc_set_customer_auth_cookie($user_id);
         }
         if (function_exists('WC') && WC()->session) {
             WC()->session->init();
             WC()->customer = new WC_Customer($user_id, true);
         }
     } catch (\Throwable $e) {
-        error_log('[ShishaRent Auth] WC hook error: ' . $e->getMessage());
+        error_log('[ShishaRent Auth] WC session error: ' . $e->getMessage());
     }
 
     $final_redirect = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
     if (!empty($redirect) && (strpos($redirect, home_url()) === 0 || strpos($redirect, '/') === 0)) {
         $final_redirect = $redirect;
     }
+
+    error_log('[ShishaRent Registration Success] New User ID: ' . $user_id . ' Email: ' . $normalized_email);
 
     wp_send_json_success([
         'message'     => __('Account created successfully! Welcome to ShishaRent.', 'shisharent'),

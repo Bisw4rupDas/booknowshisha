@@ -201,22 +201,39 @@ class Hookah_Email_Auth {
             $counter++;
         }
 
-        // Create WordPress Customer Account
-        $user_id = wp_insert_user([
-            'user_login'   => $username,
-            'user_email'   => $normalized_email,
-            'user_pass'    => $password,
-            'first_name'   => $first_name,
-            'last_name'    => $last_name,
-            'display_name' => $display_name,
-            'role'         => 'customer',
-        ]);
-
-        if (is_wp_error($user_id)) {
-            wp_send_json_error([
-                'message' => __('Could not create account: ', 'hookah-rental-core') . $user_id->get_error_message(),
+        // Create user via WooCommerce helper or native wp_insert_user
+        if (function_exists('wc_create_new_customer')) {
+            $user_id = wc_create_new_customer($normalized_email, $username, $password, [
+                'first_name'   => $first_name,
+                'last_name'    => $last_name,
+                'display_name' => $display_name,
+                'role'         => 'customer',
+            ]);
+        } else {
+            $user_id = wp_insert_user([
+                'user_login'   => $username,
+                'user_email'   => $normalized_email,
+                'user_pass'    => $password,
+                'first_name'   => $first_name,
+                'last_name'    => $last_name,
+                'display_name' => $display_name,
+                'role'         => 'customer',
             ]);
         }
+
+        if (is_wp_error($user_id)) {
+            error_log('[ShishaRent Registration Error] ' . $user_id->get_error_message());
+            wp_send_json_error([
+                'message' => $user_id->get_error_message(),
+                'code'    => $user_id->get_error_code(),
+            ]);
+        }
+
+        update_user_meta($user_id, 'first_name', $first_name);
+        update_user_meta($user_id, 'last_name', $last_name);
+        update_user_meta($user_id, 'billing_first_name', $first_name);
+        update_user_meta($user_id, 'billing_last_name', $last_name);
+        update_user_meta($user_id, 'billing_email', $normalized_email);
 
         $user = get_user_by('id', $user_id);
 

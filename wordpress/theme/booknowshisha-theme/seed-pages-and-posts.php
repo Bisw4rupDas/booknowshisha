@@ -120,7 +120,7 @@ function bns_seed_pages_and_blog_posts() {
             'title'     => 'How to Choose the Right Hookah for a Party: Size, Airflow & Multi-Hose Setups',
             'slug'      => 'how-to-choose-the-right-hookah-for-a-party',
             'category'  => 'party-ideas',
-            'image'     => 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=85',
+            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-22%20at%208.16.18%20PM.jpeg',
             'excerpt'   => 'Hosting a gathering in Kolkata? Discover how stem height, base stability, and purge valves impact your group session for effortless clouds all night.',
             'content'   => '
 <p class="bns-lead-paragraph">When hosting a celebration, house party, or rooftop gathering in Kolkata, selecting the right hookah setup can make the difference between an effortless lounge experience and constant troubleshooting. From base stability to multi-hose airflow mechanics, here is everything you need to know before your next event.</p>
@@ -147,7 +147,7 @@ function bns_seed_pages_and_blog_posts() {
             'title'     => 'Best Hookah Flavours for Different Occasions: A Connoisseur’s Mixology Guide',
             'slug'      => 'best-hookah-flavours-for-different-occasions',
             'category'  => 'flavours',
-            'image'     => 'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=1200&q=85',
+            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-23%20at%2010.59.18%20AM%20(1).jpeg',
             'excerpt'   => 'Explore the art of flavour pairing for intimate evenings, energetic celebrations, and relaxed summer sessions with world-renowned molasses blends.',
             'content'   => '
 <p class="bns-lead-paragraph">Hookah molasses is an olfactory art. Just like pairing wine with a multi-course dinner or mixing craft cocktails, selecting the right flavour profile enhances the mood of any occasion. Here is our curated guide to flavour curation for every vibe.</p>
@@ -175,7 +175,7 @@ function bns_seed_pages_and_blog_posts() {
             'title'     => 'How to Set Up a Hookah at Home for Maximum Cloud Density & Smooth Draw',
             'slug'      => 'how-to-set-up-a-hookah-at-home-smooth-draw',
             'category'  => 'tips-guides',
-            'image'     => 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=1200&q=85',
+            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-22%20at%207.16.12%20PM%20(1).jpeg',
             'excerpt'   => 'Master water levels, fluff packing techniques, and heat management for five-star lounge cloud density in the comfort of your living room.',
             'content'   => '
 <p class="bns-lead-paragraph">Ever wondered why hookah in a luxury lounge tastes so crisp and produces massive, velvet clouds while a home setup sometimes feels harsh? The secret lies in three fundamental variables: water depth, bowl pack density, and coal heat equilibrium.</p>
@@ -197,7 +197,7 @@ function bns_seed_pages_and_blog_posts() {
             'title'     => 'Planning an Unforgettable Hookah & Mobile Bar Party in Kolkata',
             'slug'      => 'planning-hookah-mobile-bar-party-kolkata',
             'category'  => 'kolkata-events',
-            'image'     => 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85',
+            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-22%20at%208.16.20%20PM%20(1).jpeg',
             'excerpt'   => 'From rooftop venues in Salt Lake to penthouses in Ballygunge, here is how to curate a five-star beverage and shisha experience for your guests.',
             'content'   => '
 <p class="bns-lead-paragraph">Kolkata has always been a city of warmth, hospitality, and sophisticated social gatherings. Whether you are hosting an intimate terrace get-together in South Kolkata or a lavish celebration in New Town, pairing mobile craft bartending with premium shisha rental creates an unforgettable hospitality standard.</p>
@@ -216,7 +216,7 @@ function bns_seed_pages_and_blog_posts() {
             'title'     => 'Hookah Care & Cleaning: Why Medical-Grade Hygiene Standards Matter',
             'slug'      => 'hookah-care-cleaning-hygiene-standards',
             'category'  => 'hookah-care',
-            'image'     => 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=85',
+            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-22%20at%207.16.17%20PM%20(1).jpeg',
             'excerpt'   => 'Learn how ultrasonic sanitization, food-grade silicone, and individually sealed mouthpieces guarantee pure taste and uncompromising safety.',
             'content'   => '
 <p class="bns-lead-paragraph">When renting or owning a hookah, hygiene is not just about cleanliness—it directly dictates the quality of the flavor. Ghosting (residual flavor lingering from previous sessions) and buildup inside traditional leather hoses can spoil even the finest molasses.</p>
@@ -235,7 +235,7 @@ function bns_seed_pages_and_blog_posts() {
             'title'     => 'Top Trends in Luxury Event Catering & Shisha Lounges for 2026',
             'slug'      => 'top-trends-luxury-event-catering-shisha-lounges-2026',
             'category'  => 'event-services',
-            'image'     => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=85',
+            'image'     => get_template_directory_uri() . '/shisharent-gallery/WhatsApp%20Image%202026-08-22%20at%208.25.41%20PM%20(1).jpeg',
             'excerpt'   => 'From LED glow bases and ice-infused chillers to artisanal botanical mocktail pairings, discover what luxury hosts in Kolkata are requesting.',
             'content'   => '
 <p class="bns-lead-paragraph">The event hospitality industry in India is experiencing a sophisticated evolution. Private hosts and corporate event planners in Kolkata are moving away from generic setups toward curated, interactive sensory lounges. Here are the top trends shaping premium celebrations this year.</p>
@@ -279,3 +279,26 @@ function bns_seed_pages_and_blog_posts() {
 
     update_option('bns_pages_blog_seeded_v1', true);
 }
+
+/**
+ * Synchronize all blog articles with authentic shisharent-gallery photos
+ */
+function bns_sync_blog_posts_with_gallery() {
+    $gallery_map = [
+        'how-to-choose-the-right-hookah-for-a-party' => 'WhatsApp Image 2026-08-22 at 8.16.18 PM.jpeg',
+        'best-hookah-flavours-for-different-occasions' => 'WhatsApp Image 2026-08-23 at 10.59.18 AM (1).jpeg',
+        'how-to-set-up-a-hookah-at-home-smooth-draw' => 'WhatsApp Image 2026-08-22 at 7.16.12 PM (1).jpeg',
+        'planning-hookah-mobile-bar-party-kolkata' => 'WhatsApp Image 2026-08-22 at 8.16.20 PM (1).jpeg',
+        'hookah-care-cleaning-hygiene-standards' => 'WhatsApp Image 2026-08-22 at 7.16.17 PM (1).jpeg',
+        'top-trends-luxury-event-catering-shisha-lounges-2026' => 'WhatsApp Image 2026-08-22 at 8.25.41 PM (1).jpeg',
+    ];
+
+    foreach ($gallery_map as $slug => $filename) {
+        $post = get_page_by_path($slug, OBJECT, 'post');
+        if ($post) {
+            $img_url = get_template_directory_uri() . '/shisharent-gallery/' . rawurlencode($filename);
+            update_post_meta($post->ID, '_bns_image_url', $img_url);
+        }
+    }
+}
+add_action('init', 'bns_sync_blog_posts_with_gallery', 30);
