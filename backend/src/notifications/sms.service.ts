@@ -28,13 +28,13 @@ export class SmsService {
   }
 
   /**
-   * Mask phone number for safe logging (e.g. +91 98300 •••45)
+   * Mask phone number for safe logging (e.g. +91 98300 ï¿½ï¿½ï¿½45)
    */
   public maskPhone(phone10: string): string {
     if (phone10.length === 10) {
-      return `+91 ${phone10.substring(0, 5)} •••${phone10.substring(8)}`;
+      return `+91 ${phone10.substring(0, 5)} ï¿½ï¿½ï¿½${phone10.substring(8)}`;
     }
-    return '+91 ••••• •••••';
+    return '+91 ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½';
   }
 
   /**
@@ -300,7 +300,7 @@ export class SmsService {
     const bodyParams = new URLSearchParams();
     bodyParams.append('To', `+91${phone10}`);
     bodyParams.append('From', fromNumber);
-    bodyParams.append('Body', `Your BookMySmoke verification code is ${otp}. Valid for 5 minutes. Do not share this code.`);
+    bodyParams.append('Body', `Your ShishaRent verification code is ${otp}. Valid for 5 minutes. Do not share this code.`);
 
     const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
 

@@ -43,7 +43,7 @@
         $tabSignUp.addClass('active');
         $('#bns-view-signup').stop(true, true).fadeIn(150);
         $title.text('CREATE ACCOUNT');
-        $subtitle.text('Create your BookMySmoke account to manage hookah rentals and checkout faster.');
+        $subtitle.text('Create your ShishaRent account to manage hookah rentals and checkout faster.');
       } else if (view === 'forgot') {
         $tabs.hide();
         $('#bns-view-forgot').stop(true, true).fadeIn(150);
@@ -55,7 +55,7 @@
         $tabSignUp.removeClass('active');
         $('#bns-view-signin').stop(true, true).fadeIn(150);
         $title.text('SIGN IN');
-        $subtitle.text('Welcome to BookMySmoke. Sign in to access your Kolkata reservations, track active rentals, and manage your account.');
+        $subtitle.text('Welcome to ShishaRent. Sign in to access your Kolkata reservations, track active rentals, and manage your account.');
       }
     }
 
@@ -74,7 +74,7 @@
         $tabSignUp.addClass('active');
         $('#bns-inpage-view-signup').stop(true, true).fadeIn(150);
         $title.text('CREATE ACCOUNT');
-        $subtitle.text('Create your BookMySmoke account to manage hookah rentals and checkout faster.');
+        $subtitle.text('Create your ShishaRent account to manage hookah rentals and checkout faster.');
       } else if (view === 'forgot') {
         $tabs.hide();
         $('#bns-inpage-view-forgot').stop(true, true).fadeIn(150);
@@ -86,7 +86,7 @@
         $tabSignUp.removeClass('active');
         $('#bns-inpage-view-signin').stop(true, true).fadeIn(150);
         $title.text('SIGN IN');
-        $subtitle.text('Welcome to BookMySmoke. Sign in to view active reservations, rental history, and manage your account.');
+        $subtitle.text('Welcome to ShishaRent. Sign in to view active reservations, rental history, and manage your account.');
       }
     }
 
@@ -238,7 +238,7 @@
             $btnText.text('Signed In!');
             showAuthAlert(res.data.message || 'Signed in successfully!', 'success', isPage);
             if (typeof showToast === 'function') {
-              showToast('Authentication', res.data.message || 'Welcome back to BookMySmoke!', 'success');
+              showToast('Authentication', res.data.message || 'Welcome back to ShishaRent!', 'success');
             }
             setTimeout(function() {
               if (res.data && res.data.redirect) {
@@ -320,7 +320,7 @@
             $btnText.text('Account Created!');
             showAuthAlert(res.data.message || 'Account created successfully!', 'success', isPage);
             if (typeof showToast === 'function') {
-              showToast('Account Created', res.data.message || 'Welcome to BookMySmoke!', 'success');
+              showToast('Account Created', res.data.message || 'Welcome to ShishaRent!', 'success');
             }
             setTimeout(function() {
               if (res.data && res.data.redirect) {
@@ -647,7 +647,7 @@
 
         // Update summary box
         $('#bns-sum-rental-title').text(pkg.title);
-        $('#bns-sum-rental-price').text('Ã¢â€šÂ¹' + parseFloat(pkg.price).toFixed(2));
+        $('#bns-sum-rental-price').text('₹' + parseFloat(pkg.price).toFixed(2));
 
         // Update images
         var imgUrl = '/wp-content/themes/booknowshisha-theme/assets/images/rentals/' + pkg.image;
@@ -681,10 +681,10 @@
         var unitTotal = rentalPrice + basePrice + chillumPrice;
         var grandTotal = unitTotal * currentQty;
 
-        $('#bns-sum-rental-price').text('Ã¢â€šÂ¹' + rentalPrice.toFixed(2));
-        $('#bns-sum-base-price').text(basePrice > 0 ? '+Ã¢â€šÂ¹' + basePrice.toFixed(2) : 'Ã¢â€šÂ¹0.00');
-        $('#bns-sum-chillum-price').text(chillumPrice > 0 ? '+Ã¢â€šÂ¹' + chillumPrice.toFixed(2) : 'Included (Ã¢â€šÂ¹0.00)');
-        $('#bns-sum-total-price').text('Ã¢â€šÂ¹' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        $('#bns-sum-rental-price').text('₹' + rentalPrice.toFixed(2));
+        $('#bns-sum-base-price').text(basePrice > 0 ? '+₹' + basePrice.toFixed(2) : '₹0.00');
+        $('#bns-sum-chillum-price').text(chillumPrice > 0 ? '+₹' + chillumPrice.toFixed(2) : 'Included (₹0.00)');
+        $('#bns-sum-total-price').text('₹' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
       }
 
       // Visual View Switcher (Rental Setup vs Prepared Bowl)
@@ -713,10 +713,10 @@
         selectedChillumPrice = parseFloat($card.data('price') || 0);
 
         $('#bns-sum-chillum-title').text(selectedChillum);
-        $('#bns-sum-chillum-price').text(selectedChillumPrice > 0 ? '+Ã¢â€šÂ¹' + selectedChillumPrice.toFixed(2) : 'Included (Ã¢â€šÂ¹0.00)');
+        $('#bns-sum-chillum-price').text(selectedChillumPrice > 0 ? '+₹' + selectedChillumPrice.toFixed(2) : 'Included (₹0.00)');
         
         recalcConfiguratorTotal();
-        showToast('Chilam Selected', selectedChillum + (selectedChillumPrice > 0 ? ' (+Ã¢â€šÂ¹100)' : '') + ' configured for your setup.', 'info');
+        showToast('Chilam Selected', selectedChillum + (selectedChillumPrice > 0 ? ' (+₹100)' : '') + ' configured for your setup.', 'info');
       });
 
       // Chip Click (Flavour Selection)
@@ -779,7 +779,7 @@
         selectedBaseLabel = $activeCard.data('label') || 'Standard Base';
 
         $('#bns-sum-base-title').text(selectedBaseLabel);
-        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+Ã¢â€šÂ¹' + selectedBasePrice.toFixed(2) : 'Ã¢â€šÂ¹0.00');
+        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+₹' + selectedBasePrice.toFixed(2) : '₹0.00');
         recalcConfiguratorTotal();
       });
 
@@ -794,7 +794,7 @@
         selectedBaseLabel = 'No Base (Chilam Only)';
 
         $('#bns-sum-base-title').text('No Base (Chilam Only)');
-        $('#bns-sum-base-price').text('Ã¢â€šÂ¹0.00');
+        $('#bns-sum-base-price').text('₹0.00');
         recalcConfiguratorTotal();
       });
 
@@ -812,7 +812,7 @@
         selectedBaseLabel = $card.data('label') || 'Standard Base';
 
         $('#bns-sum-base-title').text(selectedBaseLabel);
-        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+Ã¢â€šÂ¹' + selectedBasePrice.toFixed(2) : 'Ã¢â€šÂ¹0.00');
+        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+₹' + selectedBasePrice.toFixed(2) : '₹0.00');
         recalcConfiguratorTotal();
       });
 

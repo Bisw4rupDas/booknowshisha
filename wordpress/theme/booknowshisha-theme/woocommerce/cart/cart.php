@@ -17,7 +17,7 @@ do_action('woocommerce_before_cart'); ?>
     <div class="bns-cart-hero-header">
         <div class="bns-cart-hero-badge">
             <span class="bns-pulse-point"></span>
-            <span>BOOKMYSMOKE RESERVATION CART</span>
+            <span>SHISHARENT RESERVATION CART</span>
         </div>
         <h1 class="bns-cart-hero-title"><?php esc_html_e('YOUR CART', 'shisharent'); ?></h1>
         <p class="bns-cart-hero-subtitle"><?php esc_html_e('Review your selected hookah setups, curated flavours, and rental add-ons.', 'shisharent'); ?></p>
@@ -65,10 +65,10 @@ do_action('woocommerce_before_cart'); ?>
                             $base_map = [
                                 'none'     => __('No Base (Chilam Only)', 'shisharent'),
                                 'standard' => __('Standard Base (Included)', 'shisharent'),
-                                'ice'      => __('Ice Base (+?100)', 'shisharent'),
-                                'milk'     => __('Milk Base (+?150)', 'shisharent'),
-                                'both'     => __('Ice + Milk Base Combined (+?200)', 'shisharent'),
-                                'ice_milk' => __('Ice + Milk Base Combined (+?200)', 'shisharent'),
+                                'ice'      => __('Ice Base (+₹100)', 'shisharent'),
+                                'milk'     => __('Milk Base (+₹150)', 'shisharent'),
+                                'both'     => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
+                                'ice_milk' => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
                             ];
                             $base_display = $base_map[$hookah_base] ?? ($hookah_base_lbl ?: ucfirst($hookah_base));
                             $is_gold_c = (strcasecmp($chillum_material, 'Gold Silicone') === 0);
@@ -147,7 +147,7 @@ do_action('woocommerce_before_cart'); ?>
                                         <?php if (!empty($chillum_material)) : ?>
                                             <div class="bns-spec-chip">
                                                 <span class="bns-chip-label"><?php esc_html_e('Chillum Material:', 'shisharent'); ?></span>
-                                                <strong class="bns-chip-value"><?php echo $is_gold_c ? esc_html__('Gold Silicone (+?100)', 'shisharent') : esc_html__('Classic Clay (Included)', 'shisharent'); ?></strong>
+                                                <strong class="bns-chip-value"><?php echo $is_gold_c ? esc_html__('Gold Silicone (+₹100)', 'shisharent') : esc_html__('Classic Clay (Included)', 'shisharent'); ?></strong>
                                             </div>
                                         <?php endif; ?>
 

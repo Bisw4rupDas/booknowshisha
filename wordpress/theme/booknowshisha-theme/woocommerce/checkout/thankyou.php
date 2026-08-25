@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
         <?php if ($order->has_status('failed')) : ?>
 
             <div class="bns-card bns-thankyou-status-card bns-status-failed">
-                <div class="bns-status-icon">??</div>
+                <div class="bns-status-icon">⚠️</div>
                 <h2 class="bns-status-title"><?php esc_html_e('Payment Unsuccessful', 'shisharent'); ?></h2>
                 <p class="woocommerce-notice woocommerce-notice--error woocommerce-thankyou-order-failed"><?php esc_html_e('Unfortunately your order cannot be processed as the originating bank/merchant has declined your transaction. Please attempt your purchase again.', 'woocommerce'); ?></p>
 
@@ -65,7 +65,7 @@ if (!defined('ABSPATH')) {
 
             <!-- Next Steps & Verification Notice -->
             <div class="bns-card bns-delivery-instructions-card">
-                <h3 class="bns-card-header-title">?? <?php esc_html_e('Delivery & Inspection Protocol', 'shisharent'); ?></h3>
+                <h3 class="bns-card-header-title">📋 <?php esc_html_e('Delivery & Inspection Protocol', 'shisharent'); ?></h3>
                 <div class="bns-protocol-grid">
                     <div class="bns-protocol-step">
                         <span class="bns-step-num">1</span>

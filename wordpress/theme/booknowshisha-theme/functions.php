@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * ShishaRent Theme functions and definitions
  *
@@ -54,7 +54,7 @@ function bns_theme_setup() {
 add_action('after_setup_theme', 'bns_theme_setup');
 
 /**
- * Force Indian Rupee (INR / â‚¹) Currency Configuration in WooCommerce
+ * Force Indian Rupee (INR / ₹) Currency Configuration in WooCommerce
  */
 function bns_force_inr_currency($currency) {
     return 'INR';
@@ -62,7 +62,7 @@ function bns_force_inr_currency($currency) {
 add_filter('woocommerce_currency', 'bns_force_inr_currency', 999);
 
 function bns_force_inr_currency_symbol($currency_symbol, $currency) {
-    return 'â‚¹';
+    return '₹';
 }
 add_filter('woocommerce_currency_symbol', 'bns_force_inr_currency_symbol', 999, 2);
 
@@ -311,14 +311,14 @@ function bns_customize_admin_blog_menu() {
     global $menu, $submenu;
     foreach ($menu as $key => $item) {
         if ($item[2] === 'edit.php') {
-            $menu[$key][0] = __('Blog / Posts ðŸ“°', 'shisharent');
+            $menu[$key][0] = __('Blog / Posts 📰', 'shisharent');
         }
     }
     if (isset($submenu['edit.php'])) {
         $submenu['edit.php'][5][0]  = __('All Blog Articles', 'shisharent');
-        $submenu['edit.php'][10][0] = __('âœï¸ Add New Article', 'shisharent');
-        $submenu['edit.php'][15][0] = __('ðŸ·ï¸ Blog Categories', 'shisharent');
-        $submenu['edit.php'][16][0] = __('ðŸ”– Blog Tags', 'shisharent');
+        $submenu['edit.php'][10][0] = __('✏️ Add New Article', 'shisharent');
+        $submenu['edit.php'][15][0] = __('🏷️ Blog Categories', 'shisharent');
+        $submenu['edit.php'][16][0] = __('🔖 Blog Tags', 'shisharent');
     }
 }
 add_action('admin_menu', 'bns_customize_admin_blog_menu');
@@ -354,7 +354,7 @@ function bns_add_admin_bar_blog_node($wp_admin_bar) {
     if (!current_user_can('edit_posts')) return;
     $wp_admin_bar->add_node([
         'id'    => 'bns-add-blog-post',
-        'title' => 'âœï¸ ' . __('Add Blog Article', 'shisharent'),
+        'title' => '✏️ ' . __('Add Blog Article', 'shisharent'),
         'href'  => admin_url('post-new.php'),
     ]);
 }
@@ -366,7 +366,7 @@ add_action('admin_bar_menu', 'bns_add_admin_bar_blog_node', 90);
 function bns_register_dashboard_blog_widget() {
     wp_add_dashboard_widget(
         'bns_dashboard_blog_widget',
-        'âš¡ ' . __('ShishaRent Blog Management', 'shisharent'),
+        '⚡ ' . __('ShishaRent Blog Management', 'shisharent'),
         'bns_render_dashboard_blog_widget'
     );
 }
@@ -392,16 +392,16 @@ function bns_render_dashboard_blog_widget() {
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <a href="<?php echo esc_url(admin_url('post-new.php')); ?>" class="button button-primary" style="text-align: center; padding: 6px 12px; font-weight: 600;">
-                âœï¸ Add New Article
+                ✏️ Add New Article
             </a>
             <a href="<?php echo esc_url(admin_url('edit.php')); ?>" class="button" style="text-align: center; padding: 6px 12px; font-weight: 600;">
-                ðŸ“‹ Manage All Articles
+                📋 Manage All Articles
             </a>
             <a href="<?php echo esc_url(admin_url('edit-tags.php?taxonomy=category')); ?>" class="button" style="text-align: center; padding: 6px 12px;">
-                ðŸ·ï¸ Manage Categories
+                🏷️ Manage Categories
             </a>
             <a href="<?php echo esc_url(home_url('/blog/')); ?>" target="_blank" class="button" style="text-align: center; padding: 6px 12px;">
-                ðŸŒ View Public Blog
+                🌐 View Public Blog
             </a>
         </div>
     </div>
@@ -431,48 +431,48 @@ function bns_get_rental_packages() {
                     'title'       => 'SR BASIC CHILAM FLAVOUR',
                     'slug'        => 'sr-basic-chilam',
                     'price'       => 499.00,
-                    'price_fmt'   => 'â‚¹499',
+                    'price_fmt'   => '₹499',
                     'type'        => 'chilam',
                     'image'       => 'sr-basic-chilam.webp',
                     'tagline'     => __('Essential Single Flavour Pack', 'shisharent'),
                     'description' => __('Quick, reliable single-flavour clay phunnel pack with coconut coals for casual relaxation.', 'shisharent'),
-                    'specs'       => __('1x Clay Bowl â€¢ Coconut Coals â€¢ 60-Min Session', 'shisharent'),
+                    'specs'       => __('1x Clay Bowl • Coconut Coals • 60-Min Session', 'shisharent'),
                 ],
                 'SR REGULAR CHILAM FLAVOUR' => [
                     'tier'        => 'REGULAR',
                     'title'       => 'SR REGULAR CHILAM FLAVOUR',
                     'slug'        => 'sr-regular-chilam',
                     'price'       => 599.00,
-                    'price_fmt'   => 'â‚¹599',
+                    'price_fmt'   => '₹599',
                     'type'        => 'chilam',
                     'image'       => 'sr-regular-chilam.webp',
                     'tagline'     => __('Classic Dense Phunnel Pack', 'shisharent'),
                     'description' => __('Classic dense phunnel pack with authentic SR molasses, uniform airflow, and rich cloud density.', 'shisharent'),
-                    'specs'       => __('Dense Phunnel Pack â€¢ Extended Coals â€¢ Standard Airflow', 'shisharent'),
+                    'specs'       => __('Dense Phunnel Pack • Extended Coals • Standard Airflow', 'shisharent'),
                 ],
                 'SR PRIYAM CHILAM FLAVOUR' => [
                     'tier'        => 'PRIYAM',
                     'title'       => 'SR PRIYAM CHILAM FLAVOUR',
                     'slug'        => 'sr-priyam-chilam',
                     'price'       => 699.00,
-                    'price_fmt'   => 'â‚¹699',
+                    'price_fmt'   => '₹699',
                     'type'        => 'chilam',
                     'image'       => 'sr-priyam-chilam.webp',
                     'tagline'     => __('Signature Dual-Layer Mixology', 'shisharent'),
                     'description' => __('Signature Priyam mixology pack featuring dual-layered herbal molasses and long-burning cube coals.', 'shisharent'),
-                    'specs'       => __('Dual-Layered Mix â€¢ Long-Burning Cubes â€¢ 90-Min Duration', 'shisharent'),
+                    'specs'       => __('Dual-Layered Mix • Long-Burning Cubes • 90-Min Duration', 'shisharent'),
                 ],
                 'SR SPECIAL CHILAM FLAVOUR' => [
                     'tier'        => 'SPECIAL',
                     'title'       => 'SR SPECIAL CHILAM FLAVOUR',
                     'slug'        => 'sr-special-chilam',
                     'price'       => 799.00,
-                    'price_fmt'   => 'â‚¹799',
+                    'price_fmt'   => '₹799',
                     'type'        => 'chilam',
                     'image'       => 'sr-special-chilam.webp',
                     'tagline'     => __('Royal Reserve Master Blend', 'shisharent'),
                     'description' => __('Ultra-premium clay phunnel packed with reserve SR saffron molasses and master mixology finish.', 'shisharent'),
-                    'specs'       => __('Royal Reserve Blend â€¢ Saffron Infusion â€¢ Maximum Clouds', 'shisharent'),
+                    'specs'       => __('Royal Reserve Blend • Saffron Infusion • Maximum Clouds', 'shisharent'),
                 ],
             ],
         ],
@@ -487,60 +487,60 @@ function bns_get_rental_packages() {
                     'title'       => 'SR BASIC HOOKAH',
                     'slug'        => 'sr-basic-hookah',
                     'price'       => 899.00,
-                    'price_fmt'   => 'â‚¹899',
+                    'price_fmt'   => '₹899',
                     'type'        => 'hookah',
                     'image'       => 'sr-basic-hookah.webp',
                     'tagline'     => __('Compact Starter Setup', 'shisharent'),
                     'description' => __('Compact, reliable hookah setup perfect for intimate chill sessions and casual gatherings.', 'shisharent'),
-                    'specs'       => __('Ultrasonically Cleaned â€¢ Sealed Mouthpiece â€¢ Complete Kit', 'shisharent'),
+                    'specs'       => __('Ultrasonically Cleaned • Sealed Mouthpiece • Complete Kit', 'shisharent'),
                 ],
                 'SR REGULAR HOOKAH' => [
                     'tier'        => 'REGULAR',
                     'title'       => 'SR REGULAR HOOKAH',
                     'slug'        => 'sr-regular-hookah',
                     'price'       => 1099.00,
-                    'price_fmt'   => 'â‚¹1,099',
+                    'price_fmt'   => '₹1,099',
                     'type'        => 'hookah',
                     'image'       => 'sr-regular-hookah.webp',
                     'tagline'     => __('Handcrafted Egyptian Brass', 'shisharent'),
                     'description' => __('Handcrafted Egyptian brass hookah with effortless wide-gauge draw and crystal glass base.', 'shisharent'),
-                    'specs'       => __('Handcrafted Brass Stem â€¢ Medical Hose â€¢ 24H Rental Window', 'shisharent'),
+                    'specs'       => __('Handcrafted Brass Stem • Medical Hose • 24H Rental Window', 'shisharent'),
                 ],
                 'SR PRIYAM HOOKAH' => [
                     'tier'        => 'PRIYAM',
                     'title'       => 'SR PRIYAM HOOKAH',
                     'slug'        => 'sr-priyam-hookah',
                     'price'       => 1299.00,
-                    'price_fmt'   => 'â‚¹1,299',
+                    'price_fmt'   => '₹1,299',
                     'type'        => 'hookah',
                     'image'       => 'sr-priyam-hookah.webp',
                     'tagline'     => __('German Stainless Steel Precision', 'shisharent'),
                     'description' => __('Precision German stainless steel pipe with multi-port purge capability and quiet water diffuser.', 'shisharent'),
-                    'specs'       => __('German Stainless Steel â€¢ Whisper Diffuser â€¢ White-Glove Setup', 'shisharent'),
+                    'specs'       => __('German Stainless Steel • Whisper Diffuser • White-Glove Setup', 'shisharent'),
                 ],
                 'SR SPECIAL HOOKAH' => [
                     'tier'        => 'SPECIAL',
                     'title'       => 'SR SPECIAL HOOKAH',
                     'slug'        => 'sr-special-hookah',
                     'price'       => 1499.00,
-                    'price_fmt'   => 'â‚¹1,499',
+                    'price_fmt'   => '₹1,499',
                     'type'        => 'hookah',
                     'image'       => 'sr-special-hookah.webp',
                     'tagline'     => __('VIP Carbon Stealth Luxury', 'shisharent'),
                     'description' => __('Tactical stealth matte-black luxury hookah with carbon fiber stem for VIP celebrations.', 'shisharent'),
-                    'specs'       => __('Carbon Matte Finish â€¢ HMD Heat Regulator â€¢ Priority Dispatch', 'shisharent'),
+                    'specs'       => __('Carbon Matte Finish • HMD Heat Regulator • Priority Dispatch', 'shisharent'),
                 ],
                 'SR COMBO HOOKAH ALL FLAVOUR' => [
                     'tier'        => 'COMBO',
                     'title'       => 'SR COMBO HOOKAH ALL FLAVOUR',
                     'slug'        => 'sr-combo-hookah',
                     'price'       => 1999.00,
-                    'price_fmt'   => 'â‚¹1,999',
+                    'price_fmt'   => '₹1,999',
                     'type'        => 'hookah',
                     'image'       => 'sr-combo-hookah.webp',
                     'tagline'     => __('The Ultimate All-Inclusive Party Package', 'shisharent'),
                     'description' => __('The ultimate all-inclusive party package. Luxury pipe setup with multi-flavour sampler and electric burner.', 'shisharent'),
-                    'specs'       => __('Luxury Pipe Setup â€¢ Multi-Flavour Access â€¢ Electric Burner Included', 'shisharent'),
+                    'specs'       => __('Luxury Pipe Setup • Multi-Flavour Access • Electric Burner Included', 'shisharent'),
                 ],
             ],
         ],
@@ -602,10 +602,10 @@ add_filter('woocommerce_add_cart_item_data', function($cart_item_data, $product_
     $base_labels = [
         'none'     => __('No Base (Chilam Only)', 'shisharent'),
         'standard' => __('Standard Base (Included)', 'shisharent'),
-        'ice'      => __('Ice Base (+â‚¹100)', 'shisharent'),
-        'milk'     => __('Milk Base (+â‚¹150)', 'shisharent'),
-        'both'     => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
-        'ice_milk' => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
+        'ice'      => __('Ice Base (+₹100)', 'shisharent'),
+        'milk'     => __('Milk Base (+₹150)', 'shisharent'),
+        'both'     => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
+        'ice_milk' => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
     ];
 
     if (isset($_REQUEST['hookah_base']) && !empty($_REQUEST['hookah_base'])) {
@@ -677,17 +677,17 @@ add_filter('woocommerce_get_item_data', function($item_data, $cart_item) {
         $is_gold = (strcasecmp($cart_item['bns_chillum_material'], 'Gold Silicone') === 0);
         $item_data[] = [
             'name'  => __('Chillum Material', 'shisharent'),
-            'value' => $is_gold ? esc_html__('Gold Silicone (+â‚¹100)', 'shisharent') : esc_html__('Classic Clay (Included)', 'shisharent'),
+            'value' => $is_gold ? esc_html__('Gold Silicone (+₹100)', 'shisharent') : esc_html__('Classic Clay (Included)', 'shisharent'),
         ];
     }
     if (isset($cart_item['bns_hookah_base']) && !empty($cart_item['bns_hookah_base'])) {
         $base_labels = [
             'none'     => __('No Base (Chilam Only)', 'shisharent'),
             'standard' => __('Standard Base (Included)', 'shisharent'),
-            'ice'      => __('Ice Base (+â‚¹100)', 'shisharent'),
-            'milk'     => __('Milk Base (+â‚¹150)', 'shisharent'),
-            'both'     => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
-            'ice_milk' => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
+            'ice'      => __('Ice Base (+₹100)', 'shisharent'),
+            'milk'     => __('Milk Base (+₹150)', 'shisharent'),
+            'both'     => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
+            'ice_milk' => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
         ];
         $label = isset($base_labels[$cart_item['bns_hookah_base']]) ? $base_labels[$cart_item['bns_hookah_base']] : esc_html($cart_item['bns_hookah_base_label'] ?? $cart_item['bns_hookah_base']);
         $item_data[] = [
@@ -710,7 +710,7 @@ add_action('woocommerce_checkout_create_order_line_item', function($item, $cart_
     }
     if (isset($values['bns_chillum_material']) && !empty($values['bns_chillum_material'])) {
         $is_gold = (strcasecmp($values['bns_chillum_material'], 'Gold Silicone') === 0);
-        $item->add_meta_data(__('Chillum Material', 'shisharent'), $is_gold ? __('Gold Silicone (+â‚¹100)', 'shisharent') : __('Classic Clay (Included)', 'shisharent'), true);
+        $item->add_meta_data(__('Chillum Material', 'shisharent'), $is_gold ? __('Gold Silicone (+₹100)', 'shisharent') : __('Classic Clay (Included)', 'shisharent'), true);
         $item->add_meta_data('_bns_chillum_material', $values['bns_chillum_material'], true);
         $item->add_meta_data('_bns_chillum_price', $is_gold ? 100 : 0, true);
     }
@@ -718,10 +718,10 @@ add_action('woocommerce_checkout_create_order_line_item', function($item, $cart_
         $base_labels = [
             'none'     => __('No Base (Chilam Only)', 'shisharent'),
             'standard' => __('Standard Base (Included)', 'shisharent'),
-            'ice'      => __('Ice Base (+â‚¹100)', 'shisharent'),
-            'milk'     => __('Milk Base (+â‚¹150)', 'shisharent'),
-            'both'     => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
-            'ice_milk' => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
+            'ice'      => __('Ice Base (+₹100)', 'shisharent'),
+            'milk'     => __('Milk Base (+₹150)', 'shisharent'),
+            'both'     => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
+            'ice_milk' => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
         ];
         $label = isset($base_labels[$values['bns_hookah_base']]) ? $base_labels[$values['bns_hookah_base']] : esc_html($values['bns_hookah_base_label'] ?? $values['bns_hookah_base']);
         $item->add_meta_data(__('Hookah Base', 'shisharent'), $label, true);
@@ -773,10 +773,10 @@ function bns_ajax_add_flavour_rental_to_cart() {
     $base_labels = [
         'none'     => __('No Base (Chilam Only)', 'shisharent'),
         'standard' => __('Standard Base (Included)', 'shisharent'),
-        'ice'      => __('Ice Base (+â‚¹100)', 'shisharent'),
-        'milk'     => __('Milk Base (+â‚¹150)', 'shisharent'),
-        'both'     => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
-        'ice_milk' => __('Ice + Milk Base Combined (+â‚¹200)', 'shisharent'),
+        'ice'      => __('Ice Base (+₹100)', 'shisharent'),
+        'milk'     => __('Milk Base (+₹150)', 'shisharent'),
+        'both'     => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
+        'ice_milk' => __('Ice + Milk Base Combined (+₹200)', 'shisharent'),
     ];
 
     if (!isset($base_prices[$hookah_base])) {
@@ -1024,7 +1024,7 @@ add_filter('woocommerce_checkout_fields', function($fields) {
     // -------------------------------------------------------------
     if (isset($fields['order']['order_comments'])) {
         $fields['order']['order_comments']['label'] = __('ADD A NOTE TO YOUR ORDER', 'shisharent') . ' <span class="bns-optional-tag">(Optional)</span>';
-        $fields['order']['order_comments']['placeholder'] = __('Optional â€” add delivery instructions, landmark details or other information for our team.', 'shisharent');
+        $fields['order']['order_comments']['placeholder'] = __('Optional — add delivery instructions, landmark details or other information for our team.', 'shisharent');
         $fields['order']['order_comments']['required'] = false;
         $fields['order']['order_comments']['class'] = ['form-row-wide', 'bns-form-field'];
     }
@@ -1097,7 +1097,7 @@ add_action('woocommerce_checkout_process', function() {
             if (!$serviceability['deliverable']) {
                 wc_add_notice(
                     sprintf(
-                        __('âœ• DELIVERY NOT AVAILABLE: Currently serving Kolkata, North 24 Parganas and South 24 Parganas only. (Entered PIN: %s)', 'shisharent'),
+                        __('✕ DELIVERY NOT AVAILABLE: Currently serving Kolkata, North 24 Parganas and South 24 Parganas only. (Entered PIN: %s)', 'shisharent'),
                         esc_html($postcode)
                     ),
                     'error'
@@ -1181,11 +1181,6 @@ add_action('woocommerce_checkout_update_order_meta', function($order_id) {
         update_post_meta($order_id, '_bns_age_verified', 'yes');
     }
 }, 10, 1);
-
-
-
-
-
 
 // Auto-bootstrap Email Authentication if plugin is inactive
 add_action('after_setup_theme', function() {

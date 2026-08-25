@@ -43,7 +43,7 @@ if ($is_upi) {
         <div class="payment_box payment_method_<?php echo esc_attr($gateway_id); ?> bns-payment-desc-box" <?php if (!$gateway->chosen) : ?>style="display:none;"<?php endif; ?>>
             <?php if ($is_upi) : ?>
                 <div class="bns-upi-inner-desc">
-                    <p class="bns-upi-prompt">?? <strong>Pay directly via UPI:</strong> Scan QR code or trigger UPI intent on the next confirmation screen using Google Pay, PhonePe, Paytm, CRED or any BHIM UPI app.</p>
+                    <p class="bns-upi-prompt">⚡ <strong>Pay directly via UPI:</strong> Scan QR code or trigger UPI intent on the next confirmation screen using Google Pay, PhonePe, Paytm, CRED or any BHIM UPI app.</p>
                 </div>
             <?php endif; ?>
             <?php $gateway->payment_fields(); ?>

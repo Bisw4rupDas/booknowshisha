@@ -247,7 +247,7 @@ class Hookah_Email_Auth {
         }
 
         wp_send_json_success([
-            'message'     => __('Account created successfully! Welcome to BookMySmoke.', 'hookah-rental-core'),
+            'message'     => __('Account created successfully! Welcome to ShishaRent.', 'hookah-rental-core'),
             'redirect'    => $final_redirect,
             'is_new_user' => true,
             'user'        => [
@@ -295,7 +295,7 @@ class Hookah_Email_Auth {
                         ], wc_get_endpoint_url('lost-password', '', wc_get_page_permalink('myaccount')));
                     }
 
-                    $message = __('Someone has requested a password reset for your BookMySmoke customer account:', 'hookah-rental-core') . "\r\n\r\n";
+                    $message = __('Someone has requested a password reset for your ShishaRent customer account:', 'hookah-rental-core') . "\r\n\r\n";
                     $message .= sprintf(__('Site Name: %s', 'hookah-rental-core'), $site_name) . "\r\n";
                     $message .= sprintf(__('Account Email: %s', 'hookah-rental-core'), $user->user_email) . "\r\n\r\n";
                     $message .= __('If you did not make this request, you can safely ignore this email.', 'hookah-rental-core') . "\r\n\r\n";

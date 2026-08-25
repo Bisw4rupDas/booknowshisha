@@ -1201,7 +1201,7 @@ html[data-theme="dark"] .bns-hero-section {
 }
 
 /* ==========================================================================
-   6. SECTION 3: ABOUT / BRAND SECTION (ÃƒÂÃ…Â¾ ÃƒÂÃ‚ÂÃƒÂÃ‚ÂÃƒÂÃ‚Â¡ style)
+   6. SECTION 3: ABOUT / BRAND SECTION
    ========================================================================== */
 .bns-section {
   padding: 90px 0;
@@ -1355,7 +1355,7 @@ html[data-theme="dark"] .bns-hero-section {
 }
 
 /* ==========================================================================
-   7. SECTION 4: FEATURED CATALOG & PROMOTIONS (ÃƒÂÃ‚ÂÃƒÂÃ…Â¡ÃƒÂÃ‚Â¦ÃƒÂÃ‹Å“ÃƒÂÃ…Â¾ÃƒÂÃ‚ÂÃƒÂÃ‚ÂÃƒÂÃ‚Â«ÃƒÂÃ¢â‚¬Â¢ ÃƒÂÃ‚Â¢ÃƒÂÃ…Â¾ÃƒÂÃ¢â‚¬â„¢ÃƒÂÃ‚ÂÃƒÂÃ‚Â ÃƒÂÃ‚Â«)
+   7. SECTION 4: FEATURED CATALOG & PROMOTIONS
    ========================================================================== */
 .bns-products-section {
   background: var(--bns-bg-body);
@@ -4469,7 +4469,7 @@ body.bns-lightbox-open {
 
 
 /* ==========================================================================
-   FLAVOUR SELECTION PAGE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â TWO-COLUMN PRODUCT CONFIGURATOR
+   FLAVOUR SELECTION PAGE — TWO-COLUMN PRODUCT CONFIGURATOR
    ========================================================================== */
 .bns-cfg-hero {
   padding: 100px 0 32px 0;

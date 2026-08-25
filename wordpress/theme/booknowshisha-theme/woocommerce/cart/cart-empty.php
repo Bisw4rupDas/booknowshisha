@@ -30,7 +30,7 @@ if (!defined('ABSPATH')) {
 
         <div class="bns-empty-btn-group">
             <a href="<?php echo esc_url(home_url('/flavour-selection/')); ?>" class="button bns-btn-cart-gold">
-                <?php esc_html_e('EXPLORE FLAVOURS ?', 'shisharent'); ?>
+                <?php esc_html_e('EXPLORE FLAVOURS →', 'shisharent'); ?>
             </a>
             <a href="<?php echo esc_url(home_url('/#packages')); ?>" class="button bns-btn-cart-secondary">
                 <?php esc_html_e('VIEW RENTAL PACKAGES', 'shisharent'); ?>

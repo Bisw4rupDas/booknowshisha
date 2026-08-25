@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Footer template for ShishaRent Theme (Kolkata Edition)
  * Includes official shop address, quick links, and health/safety notice.
@@ -42,20 +42,20 @@
                 <h5 class="bns-footer-heading"><?php esc_html_e('Official Shop Locations', 'shisharent'); ?></h5>
                 <div class="bns-footer-address-box">
                     <p class="bns-address-line" style="margin-bottom: 12px;">
-                        <strong style="color: var(--bns-accent-gold, #d4a95f);">Ã°Å¸â€œÂ <?php esc_html_e('Ballygunge Hub', 'shisharent'); ?></strong><br>
+                        <strong style="color: var(--bns-accent-gold, #d4a95f);">📍 <?php esc_html_e('Ballygunge Hub', 'shisharent'); ?></strong><br>
                         Camac Street Area, 9/2A, Chamru Khansama Ln,<br>
                         Park Circus, Ballygunge,<br>
                         Kolkata, West Bengal 700019
                     </p>
                     <p class="bns-address-line" style="margin-bottom: 12px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">
-                        <strong style="color: var(--bns-accent-gold, #d4a95f);">Ã°Å¸â€œÂ <?php esc_html_e('Park Street Hub', 'shisharent'); ?></strong><br>
+                        <strong style="color: var(--bns-accent-gold, #d4a95f);">📍 <?php esc_html_e('Park Street Hub', 'shisharent'); ?></strong><br>
                         Park Street, Chaurangi More,<br>
-                        Kolkata Ã¢â‚¬â€œ 700071,<br>
+                        Kolkata – 700071,<br>
                         West Bengal, India
                     </p>
                     <a href="https://maps.google.com/?q=Park+Street,+Chaurangi+More,+Kolkata+700071" target="_blank" rel="noopener noreferrer" class="bns-gold-link" style="display:inline-flex; align-items:center; gap:6px; margin-top: 4px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span><?php esc_html_e('Get Directions on Google Maps', 'shisharent'); ?> Ã¢â€ â€™</span>
+                        <span><?php esc_html_e('Get Directions on Google Maps', 'shisharent'); ?> →</span>
                     </a>
                     <div class="bns-footer-phone-list" style="margin-top: 14px;">
                         <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
@@ -92,11 +92,11 @@
             <div class="bns-footer-col">
                 <h5 class="bns-footer-heading"><?php esc_html_e('Kolkata Service Zones', 'shisharent'); ?></h5>
                 <ul class="bns-footer-links">
-                    <li><span class="bns-area-tag">Ã¢Å“â€œ</span> <?php esc_html_e('Salt Lake & New Town (Sec I-V, AA I-III)', 'shisharent'); ?></li>
-                    <li><span class="bns-area-tag">Ã¢Å“â€œ</span> <?php esc_html_e('South Kolkata (Ballygunge, Alipore, Gariahat)', 'shisharent'); ?></li>
-                    <li><span class="bns-area-tag">Ã¢Å“â€œ</span> <?php esc_html_e('Central Kolkata (Park Street, Camac St, Esplanade)', 'shisharent'); ?></li>
-                    <li><span class="bns-area-tag">Ã¢Å“â€œ</span> <?php esc_html_e('Rajarhat & North Hubs (Chinar Park, Lake Town)', 'shisharent'); ?></li>
-                    <li><a href="<?php echo esc_url(home_url('/#checker')); ?>" class="bns-gold-link"><?php esc_html_e('Ã¢â€ â€™ Check Delivery PIN Code', 'shisharent'); ?></a></li>
+                    <li><span class="bns-area-tag">✓</span> <?php esc_html_e('Salt Lake & New Town (Sec I-V, AA I-III)', 'shisharent'); ?></li>
+                    <li><span class="bns-area-tag">✓</span> <?php esc_html_e('South Kolkata (Ballygunge, Alipore, Gariahat)', 'shisharent'); ?></li>
+                    <li><span class="bns-area-tag">✓</span> <?php esc_html_e('Central Kolkata (Park Street, Camac St, Esplanade)', 'shisharent'); ?></li>
+                    <li><span class="bns-area-tag">✓</span> <?php esc_html_e('Rajarhat & North Hubs (Chinar Park, Lake Town)', 'shisharent'); ?></li>
+                    <li><a href="<?php echo esc_url(home_url('/#checker')); ?>" class="bns-gold-link"><?php esc_html_e('→ Check Delivery PIN Code', 'shisharent'); ?></a></li>
                 </ul>
                 <div class="bns-age-badge" style="margin-top: 14px;">
                     <span class="bns-age-number">21+</span>
@@ -199,9 +199,9 @@
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
             </div>
-            <span class="bns-auth-badge"><?php esc_html_e('BOOKMYSMOKE VIP', 'shisharent'); ?></span>
+            <span class="bns-auth-badge"><?php esc_html_e('SHISHARENT VIP', 'shisharent'); ?></span>
             <h3 id="bns-modal-title" class="bns-auth-title"><?php esc_html_e('SIGN IN', 'shisharent'); ?></h3>
-            <p id="bns-modal-subtitle" class="bns-auth-subtitle"><?php esc_html_e('Welcome to BookMySmoke. Sign in to access your Kolkata reservations, track active rentals, and manage your account.', 'shisharent'); ?></p>
+            <p id="bns-modal-subtitle" class="bns-auth-subtitle"><?php esc_html_e('Welcome to ShishaRent. Sign in to access your Kolkata reservations, track active rentals, and manage your account.', 'shisharent'); ?></p>
         </div>
 
         <!-- Sleek Dual Pill Tab Switcher -->

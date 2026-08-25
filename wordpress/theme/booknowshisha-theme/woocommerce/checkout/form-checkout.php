@@ -28,7 +28,7 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
             <span>KOLKATA • NORTH 24 PGS • SOUTH 24 PGS</span>
         </div>
         <h1 class="bns-checkout-title">CHECKOUT</h1>
-        <p class="bns-checkout-subtitle">Enter your delivery details to complete your BookMySmoke rental.</p>
+        <p class="bns-checkout-subtitle">Enter your delivery details to complete your ShishaRent rental.</p>
     </div>
 
     <form name="checkout" method="post" class="checkout woocommerce-checkout bns-checkout-layout-grid" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data">
@@ -191,7 +191,7 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
             <!-- 4. ORDER NOTES (Optional) -->
             <div class="bns-checkout-panel" id="bns-order-notes-panel">
                 <div class="bns-panel-heading">
-                    <div class="bns-step-badge bns-optional-badge">?</div>
+                    <div class="bns-step-badge bns-optional-badge">✎</div>
                     <div class="bns-heading-content">
                         <h2 class="bns-panel-title">ADD A NOTE TO YOUR ORDER <span class="bns-optional-tag">(Optional)</span></h2>
                         <p class="bns-panel-desc">Optional — add delivery instructions, landmark details or other information for our team.</p>

@@ -43,7 +43,7 @@ function bns_seed_bms_flavours_catalog($force_reseed = true) {
     if (!$term) {
         $created_cat = wp_insert_term($cat_name, 'product_cat', [
             'slug' => $cat_slug,
-            'description' => 'Genuine BMS artisanal molasses and premium international shisha flavour blends.',
+            'description' => 'Genuine SR artisanal molasses and premium international shisha flavour blends.',
         ]);
         $cat_id = is_array($created_cat) ? $created_cat['term_id'] : 0;
     } else {

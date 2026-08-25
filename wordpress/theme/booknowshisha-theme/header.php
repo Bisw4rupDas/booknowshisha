@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Header template for ShishaRent Theme (Kolkata Edition)
  * Includes Light/Dark theme initialization and accessible theme toggle controls.
@@ -58,7 +58,7 @@
                         <!-- Services Dropdown -->
                         <li class="bns-nav-dropdown-parent">
                             <a href="<?php echo esc_url(home_url('/bartending-party-services/')); ?>" class="bns-dropdown-trigger <?php echo (is_page('bartending-party-services') || is_page('party-occasion-hookah')) ? 'active' : ''; ?>">
-                                <?php esc_html_e('SERVICES', 'shisharent'); ?> <span class="bns-dropdown-arrow">Ã¢â€“Â¾</span>
+                                <?php esc_html_e('SERVICES', 'shisharent'); ?> <span class="bns-dropdown-arrow">▾</span>
                             </a>
                             <ul class="bns-dropdown-menu">
                                 <li>
@@ -196,7 +196,7 @@
                                     </div>
                                 <?php else: ?>
                                     <div class="bns-account-guest-header">
-                                        <span class="bns-guest-badge"><?php esc_html_e('BOOKMYSMOKE ACCOUNT', 'shisharent'); ?></span>
+                                        <span class="bns-guest-badge"><?php esc_html_e('SHISHARENT ACCOUNT', 'shisharent'); ?></span>
                                         <h4 class="bns-guest-title"><?php esc_html_e('Sign In', 'shisharent'); ?></h4>
                                         <p class="bns-guest-desc"><?php esc_html_e('Access your active hookah reservations, rental history & saved Kolkata delivery addresses.', 'shisharent'); ?></p>
                                         <a href="#" class="button bns-btn-account-login bns-open-auth-btn">
@@ -255,7 +255,7 @@
                 <a href="<?php echo esc_url(home_url('/')); ?>" class="bns-drawer-logo" rel="home">
                     <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/logo.png?v=' . filemtime(get_template_directory() . '/assets/images/logo.png')); ?>" alt="<?php esc_attr_e('ShishaRent', 'shisharent'); ?>" class="bns-logo-img bns-drawer-logo-img" />
                 </a>
-                <button type="button" class="bns-drawer-close" id="bns-drawer-close" aria-label="<?php esc_attr_e('Close Menu', 'shisharent'); ?>">Ã¢Å“â€¢</button>
+                <button type="button" class="bns-drawer-close" id="bns-drawer-close" aria-label="<?php esc_attr_e('Close Menu', 'shisharent'); ?>">✕</button>
             </div>
 
             <!-- Mobile Theme Toggle Bar -->
@@ -307,7 +307,7 @@
                     <?php else: ?>
                         <div class="bns-mobile-guest-box">
                             <div class="bns-mobile-guest-text">
-                                <span class="bns-mobile-guest-tag"><?php esc_html_e('BOOKMYSMOKE VIP', 'shisharent'); ?></span>
+                                <span class="bns-mobile-guest-tag"><?php esc_html_e('SHISHARENT VIP', 'shisharent'); ?></span>
                                 <strong><?php esc_html_e('Account & Reservations', 'shisharent'); ?></strong>
                                 <p><?php esc_html_e('Sign in to track active rentals & saved delivery addresses.', 'shisharent'); ?></p>
                             </div>

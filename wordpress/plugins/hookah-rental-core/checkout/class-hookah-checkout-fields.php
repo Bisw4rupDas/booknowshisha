@@ -102,7 +102,7 @@ class Hookah_Checkout_Fields {
             if (!$serviceability['deliverable']) {
                 wc_add_notice(
                     sprintf(
-                        __('✕ DELIVERY NOT AVAILABLE: Sorry, BookMySmoke currently delivers only within Kolkata, North 24 Parganas and South 24 Parganas. (Entered PIN: %s)', 'hookah-rental-core'),
+                        __('✕ DELIVERY NOT AVAILABLE: Sorry, ShishaRent currently delivers only within Kolkata, North 24 Parganas and South 24 Parganas. (Entered PIN: %s)', 'hookah-rental-core'),
                         esc_html($postcode)
                     ),
                     'error'

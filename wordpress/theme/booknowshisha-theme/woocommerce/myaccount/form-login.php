@@ -23,9 +23,9 @@ do_action('woocommerce_before_customer_login_form'); ?>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
             </div>
-            <span class="bns-auth-badge"><?php esc_html_e('BOOKMYSMOKE VIP', 'shisharent'); ?></span>
+            <span class="bns-auth-badge"><?php esc_html_e('SHISHARENT VIP', 'shisharent'); ?></span>
             <h2 id="bns-inpage-auth-title" class="bns-auth-title"><?php esc_html_e('SIGN IN', 'shisharent'); ?></h2>
-            <p id="bns-inpage-auth-subtitle" class="bns-auth-subtitle"><?php esc_html_e('Welcome to BookMySmoke. Sign in to view active reservations, rental history, and manage your account.', 'shisharent'); ?></p>
+            <p id="bns-inpage-auth-subtitle" class="bns-auth-subtitle"><?php esc_html_e('Welcome to ShishaRent. Sign in to view active reservations, rental history, and manage your account.', 'shisharent'); ?></p>
         </div>
 
         <!-- Sleek Dual Pill Tab Switcher -->

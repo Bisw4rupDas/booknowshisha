@@ -17,7 +17,7 @@ if (!wp_doing_ajax()) {
     <?php if (WC()->cart->needs_payment()) : ?>
         <div class="bns-upi-headline-block">
             <div class="bns-upi-title-row">
-                <span class="bns-upi-lock-icon">??</span>
+                <span class="bns-upi-lock-icon">🔒</span>
                 <h4 class="bns-upi-head-title"><?php esc_html_e('SELECT PAYMENT METHOD', 'shisharent'); ?></h4>
             </div>
             <p class="bns-upi-head-desc"><?php esc_html_e('Pay securely using UPI apps such as Google Pay, PhonePe, Paytm, BHIM or your banking app.', 'shisharent'); ?></p>
@@ -60,15 +60,15 @@ if (!wp_doing_ajax()) {
         <?php do_action('woocommerce_review_order_before_submit'); ?>
 
         <?php
-        $order_button_text = apply_filters('woocommerce_order_button_text', __('CONFIRM & PLACE RENTAL ORDER ?', 'shisharent'));
+        $order_button_text = apply_filters('woocommerce_order_button_text', __('CONFIRM & PLACE RENTAL ORDER →', 'shisharent'));
         echo apply_filters('woocommerce_order_button_html', '<button type="submit" class="button alt bns-btn-place-order" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr($order_button_text) . '" data-value="' . esc_attr($order_button_text) . '">
-            <span class="bns-btn-lock">??</span>
+            <span class="bns-btn-lock">🔒</span>
             <span class="bns-btn-label">' . esc_html($order_button_text) . '</span>
         </button>');
         ?>
 
         <div class="bns-place-order-subtext">
-            <span>??? 256-Bit Encrypted Secure Checkout</span> • <span>Government Photo ID required on delivery</span>
+            <span>🔒 256-Bit Encrypted Secure Checkout</span> • <span>Government Photo ID required on delivery</span>
         </div>
 
         <?php do_action('woocommerce_review_order_after_submit'); ?>
