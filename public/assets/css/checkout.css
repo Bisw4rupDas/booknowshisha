@@ -1,0 +1,931 @@
+/* ==========================================================================
+   SHISHARENT — LUXURY KOLKATA CHECKOUT STYLES
+   Dark Luxury & Clean Light Mode Compatibility
+   ========================================================================== */
+
+/* Outer Page Wrap */
+.bns-checkout-page-container {
+  padding-top: 40px;
+  padding-bottom: 80px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.bns-checkout-wrapper {
+  width: 100%;
+}
+
+/* Header Section */
+.bns-checkout-header-block {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--bns-border-card, rgba(212, 169, 95, 0.2));
+}
+
+.bns-checkout-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(212, 169, 95, 0.1);
+  border: 1px solid var(--bns-accent-gold, #d4a95f);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--bns-accent-gold, #d4a95f);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.bns-pulse-point {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #22c55e;
+  display: inline-block;
+  animation: bnsPulse 2s infinite;
+}
+
+@keyframes bnsPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.bns-checkout-title {
+  font-family: var(--bns-font-heading, 'Cinzel', serif);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--bns-text-primary, #f8fafc);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+.bns-checkout-subtitle {
+  font-size: 1.05rem;
+  color: var(--bns-text-secondary, #cbd5e1);
+  margin: 0 auto;
+  max-width: 600px;
+  font-weight: 400;
+}
+
+/* Two-Column Responsive Layout */
+.bns-checkout-layout-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 440px !important;
+  gap: 36px !important;
+  align-items: start !important;
+}
+
+@media (max-width: 1024px) {
+  .bns-checkout-layout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+}
+
+/* Panels (Cards) */
+.bns-checkout-panel {
+  background: var(--bns-bg-card, #0a0b0e);
+  border: 1px solid var(--bns-border-card, rgba(255, 255, 255, 0.08));
+  border-radius: var(--bns-radius-lg, 12px);
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.25s ease;
+}
+
+.bns-checkout-panel:hover {
+  border-color: var(--bns-border-hover, rgba(212, 169, 95, 0.35));
+}
+
+/* Panel Heading */
+.bns-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--bns-border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.bns-step-badge {
+  width: 32px;
+  height: 32px;
+  background: var(--bns-accent-gold, #d4a95f);
+  color: #0b0c10;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.bns-optional-badge {
+  background: rgba(212, 169, 95, 0.2);
+  color: var(--bns-accent-gold, #d4a95f);
+}
+
+.bns-heading-content {
+  flex: 1;
+}
+
+.bns-panel-title {
+  font-family: var(--bns-font-heading, 'Cinzel', serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--bns-text-primary, #f8fafc);
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+}
+
+.bns-panel-desc {
+  font-size: 0.85rem;
+  color: var(--bns-text-muted, #94a3b8);
+  margin: 0;
+}
+
+.bns-optional-tag {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--bns-text-muted, #94a3b8);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Delivery Location Notice Card */
+.bns-delivery-location-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  background: rgba(212, 169, 95, 0.07);
+  border: 1px solid rgba(212, 169, 95, 0.25);
+  border-radius: var(--bns-radius-md, 8px);
+  margin-bottom: 24px;
+}
+
+.bns-dlc-icon-wrap {
+  color: var(--bns-accent-gold, #d4a95f);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bns-dlc-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--bns-accent-gold, #d4a95f);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.bns-dlc-main {
+  font-size: 0.92rem;
+  color: var(--bns-text-primary, #f8fafc);
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.bns-dlc-sub {
+  font-size: 0.82rem;
+  color: var(--bns-text-muted, #94a3b8);
+  margin: 0;
+}
+
+/* Form Fields Styling */
+.bns-form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.bns-form-grid .form-row {
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+.bns-form-grid .form-row-wide {
+  width: 100% !important;
+}
+
+.bns-form-grid .form-row-first,
+.bns-form-grid .form-row-last {
+  width: calc(50% - 8px) !important;
+}
+
+@media (max-width: 640px) {
+  .bns-form-grid .form-row-first,
+  .bns-form-grid .form-row-last {
+    width: 100% !important;
+  }
+}
+
+.bns-hidden-field {
+  display: none !important;
+}
+
+/* Labels */
+.woocommerce form .form-row label {
+  display: block !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--bns-text-secondary, #cbd5e1) !important;
+  margin-bottom: 8px !important;
+}
+
+.woocommerce form .form-row label .required {
+  color: #ef4444 !important;
+  font-size: 1rem !important;
+  margin-left: 2px !important;
+  text-decoration: none !important;
+}
+
+/* Inputs & Selects */
+.woocommerce form .form-row input.input-text,
+.woocommerce form .form-row select,
+.woocommerce form .form-row textarea {
+  width: 100% !important;
+  background: var(--bns-bg-surface, #121318) !important;
+  border: 1px solid var(--bns-border-card, rgba(255, 255, 255, 0.12)) !important;
+  color: var(--bns-text-primary, #f8fafc) !important;
+  padding: 13px 16px !important;
+  font-size: 0.95rem !important;
+  font-family: var(--bns-font-main, sans-serif) !important;
+  border-radius: var(--bns-radius-md, 8px) !important;
+  transition: all 0.2s ease !important;
+  box-shadow: var(--bns-shadow-input, inset 0 1px 3px rgba(0,0,0,0.4)) !important;
+}
+
+.woocommerce form .form-row input.input-text::placeholder,
+.woocommerce form .form-row textarea::placeholder {
+  color: var(--bns-text-muted, #64748b) !important;
+  opacity: 0.8 !important;
+}
+
+.woocommerce form .form-row input.input-text:focus,
+.woocommerce form .form-row select:focus,
+.woocommerce form .form-row textarea:focus {
+  border-color: var(--bns-accent-gold, #d4a95f) !important;
+  box-shadow: 0 0 0 3px var(--bns-accent-gold-glow, rgba(212, 169, 95, 0.25)) !important;
+  background: var(--bns-bg-card, #0a0b0e) !important;
+  outline: none !important;
+}
+
+/* Disabled/Readonly inputs (e.g. locked country) */
+.woocommerce form .form-row input[readonly],
+.woocommerce form .form-row select[disabled] {
+  opacity: 0.75 !important;
+  cursor: not-allowed !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Age verification custom check styling */
+.bns-age-checkbox-wrap {
+  background: rgba(212, 169, 95, 0.06);
+  border: 1px dashed rgba(212, 169, 95, 0.35);
+  border-radius: var(--bns-radius-md, 8px);
+  padding: 14px 18px !important;
+  margin-top: 8px !important;
+}
+
+.bns-age-checkbox-wrap label.checkbox {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  color: var(--bns-text-primary, #f8fafc) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+}
+
+.bns-age-checkbox-wrap input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  margin-top: 2px !important;
+  accent-color: var(--bns-accent-gold, #d4a95f) !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: STICKY ORDER SUMMARY
+   ========================================================================== */
+.bns-sticky-summary-card {
+  background: var(--bns-bg-card, #0a0b0e);
+  border: 1px solid var(--bns-border-gold, rgba(212, 169, 95, 0.3));
+  border-radius: var(--bns-radius-lg, 12px);
+  padding: 28px;
+  position: sticky;
+  top: 100px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.bns-summary-top {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--bns-border-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.bns-summary-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.bns-summary-title {
+  font-family: var(--bns-font-heading, 'Cinzel', serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--bns-text-primary, #f8fafc);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.bns-summary-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  background: rgba(212, 169, 95, 0.15);
+  color: var(--bns-accent-gold, #d4a95f);
+  border-radius: 9999px;
+  border: 1px solid rgba(212, 169, 95, 0.3);
+}
+
+.bns-summary-sub {
+  font-size: 0.82rem;
+  color: var(--bns-text-muted, #94a3b8);
+  margin: 0;
+}
+
+/* Review Table */
+.bns-checkout-review-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-bottom: 24px !important;
+  background: transparent !important;
+}
+
+.bns-checkout-review-table th,
+.bns-checkout-review-table td {
+  padding: 12px 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.bns-checkout-review-table thead {
+  display: none !important;
+}
+
+.bns-cart-item-row {
+  border-bottom: 1px solid var(--bns-border-subtle, rgba(255, 255, 255, 0.06)) !important;
+}
+
+.bns-review-product-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.bns-review-thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--bns-radius-sm, 6px);
+  overflow: hidden;
+  border: 1px solid var(--bns-border-card, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+  background: #000;
+}
+
+.bns-review-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bns-review-details {
+  flex: 1;
+}
+
+.bns-review-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--bns-text-primary, #f8fafc);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.bns-review-title .product-quantity {
+  color: var(--bns-accent-gold, #d4a95f);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Rental Specs Breakdown */
+.bns-rental-specs-pill-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.bns-spec-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.bns-spec-label {
+  color: var(--bns-text-muted, #94a3b8);
+  font-weight: 500;
+}
+
+.bns-spec-val {
+  color: var(--bns-text-secondary, #cbd5e1);
+  font-weight: 600;
+  text-align: right;
+}
+
+.bns-gold-text {
+  color: var(--bns-accent-gold, #d4a95f) !important;
+  font-weight: 700 !important;
+}
+
+.bns-total-col {
+  text-align: right !important;
+  vertical-align: top !important;
+  padding-top: 14px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: var(--bns-text-primary, #f8fafc) !important;
+}
+
+/* Summary Footer Rows */
+.bns-summary-row th {
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: var(--bns-text-secondary, #cbd5e1) !important;
+  text-align: left !important;
+}
+
+.bns-summary-row td {
+  text-align: right !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--bns-text-primary, #f8fafc) !important;
+}
+
+.bns-free-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.bns-grand-total-row {
+  border-top: 2px solid var(--bns-border-gold, rgba(212, 169, 95, 0.4)) !important;
+  padding-top: 16px !important;
+}
+
+.bns-grand-total-row th {
+  font-family: var(--bns-font-heading, 'Cinzel', serif) !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  color: var(--bns-accent-gold, #d4a95f) !important;
+  text-transform: uppercase !important;
+}
+
+.bns-grand-total-row td strong .woocommerce-Price-amount {
+  font-family: var(--bns-font-main, sans-serif) !important;
+  font-size: 1.45rem !important;
+  font-weight: 800 !important;
+  color: var(--bns-accent-gold, #d4a95f) !important;
+}
+
+/* Assurance Points List */
+.bns-assurance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--bns-border-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.bns-assurance-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--bns-text-secondary, #cbd5e1);
+}
+
+.bns-assurance-item svg {
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   PAYMENT GATEWAYS STYLING (INDIA & UPI FOCUS)
+   ========================================================================== */
+.bns-upi-headline-block {
+  background: rgba(212, 169, 95, 0.08);
+  border: 1px solid rgba(212, 169, 95, 0.25);
+  border-radius: var(--bns-radius-md, 8px);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.bns-upi-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.bns-upi-head-title {
+  font-family: var(--bns-font-heading, 'Cinzel', serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--bns-accent-gold, #d4a95f);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.bns-upi-head-desc {
+  font-size: 0.84rem;
+  color: var(--bns-text-secondary, #cbd5e1);
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.bns-upi-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bns-upi-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 169, 95, 0.3);
+  border-radius: 4px;
+  color: #f8fafc;
+}
+
+.bns-chip-gpay { border-color: rgba(66, 133, 244, 0.5); }
+.bns-chip-phonepe { border-color: rgba(95, 37, 159, 0.6); }
+.bns-chip-paytm { border-color: rgba(0, 186, 242, 0.5); }
+.bns-chip-bhim { border-color: rgba(0, 166, 81, 0.5); }
+.bns-chip-cred { border-color: rgba(255, 255, 255, 0.4); }
+
+.bns-payment-methods-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 0 24px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.bns-payment-method-item {
+  background: var(--bns-bg-surface, #121318) !important;
+  border: 1px solid var(--bns-border-card, rgba(255, 255, 255, 0.1)) !important;
+  border-radius: var(--bns-radius-md, 8px) !important;
+  padding: 16px 20px !important;
+  transition: all 0.2s ease !important;
+}
+
+.bns-payment-method-item.bns-active-payment,
+.bns-payment-method-item:hover {
+  border-color: var(--bns-accent-gold, #d4a95f) !important;
+  background: rgba(212, 169, 95, 0.04) !important;
+}
+
+.bns-payment-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bns-payment-radio-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  color: var(--bns-text-primary, #f8fafc) !important;
+  font-weight: 600 !important;
+}
+
+.bns-custom-radio {
+  width: 18px !important;
+  height: 18px !important;
+  accent-color: var(--bns-accent-gold, #d4a95f) !important;
+  cursor: pointer !important;
+}
+
+.bns-payment-desc-box {
+  margin-top: 14px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid var(--bns-border-subtle, rgba(255, 255, 255, 0.08)) !important;
+  font-size: 0.85rem !important;
+  color: var(--bns-text-secondary, #cbd5e1) !important;
+  line-height: 1.5 !important;
+}
+
+.bns-upi-prompt {
+  margin: 0 0 10px 0;
+  color: var(--bns-text-primary, #f8fafc);
+}
+
+/* Place Order Action Button */
+.bns-place-order-wrap {
+  margin-top: 24px !important;
+}
+
+.bns-btn-place-order {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 18px 28px !important;
+  background: linear-gradient(135deg, #e5c158 0%, #b8863b 100%) !important;
+  color: #0b0c10 !important;
+  font-family: var(--bns-font-main, sans-serif) !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  border: none !important;
+  border-radius: var(--bns-radius-md, 8px) !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 24px rgba(184, 134, 59, 0.35) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.bns-btn-place-order:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 30px rgba(184, 134, 59, 0.5) !important;
+  background: linear-gradient(135deg, #f0cf70 0%, #c99645 100%) !important;
+}
+
+.bns-place-order-subtext {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--bns-text-muted, #94a3b8);
+}
+
+/* Thank You & Order Confirmation */
+.bns-thankyou-wrapper {
+  max-width: 860px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.bns-thankyou-hero {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.bns-thankyou-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #22c55e;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.bns-thankyou-title {
+  font-family: var(--bns-font-heading, 'Cinzel', serif);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--bns-text-primary, #f8fafc);
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+}
+
+.bns-thankyou-sub {
+  font-size: 1rem;
+  color: var(--bns-text-secondary, #cbd5e1);
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+.bns-order-metrics-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 24px;
+  background: var(--bns-bg-card, #0a0b0e);
+  border: 1px solid var(--bns-border-gold, rgba(212, 169, 95, 0.3));
+  border-radius: var(--bns-radius-lg, 12px);
+  margin-bottom: 30px;
+}
+
+.bns-metric-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bns-metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--bns-text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bns-metric-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--bns-text-primary, #f8fafc);
+}
+
+.bns-delivery-instructions-card {
+  padding: 28px;
+  background: var(--bns-bg-card, #0a0b0e);
+  border: 1px solid var(--bns-border-card, rgba(255, 255, 255, 0.08));
+  border-radius: var(--bns-radius-lg, 12px);
+  margin-bottom: 30px;
+}
+
+.bns-card-header-title {
+  font-family: var(--bns-font-heading, 'Cinzel', serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--bns-accent-gold, #d4a95f);
+  margin: 0 0 20px 0;
+  letter-spacing: 0.05em;
+}
+
+.bns-protocol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.bns-protocol-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bns-protocol-step .bns-step-num {
+  width: 28px;
+  height: 28px;
+  background: rgba(212, 169, 95, 0.2);
+  color: var(--bns-accent-gold, #d4a95f);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.bns-step-text strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--bns-text-primary, #f8fafc);
+  margin-bottom: 4px;
+}
+
+.bns-step-text p {
+  font-size: 0.82rem;
+  color: var(--bns-text-muted, #94a3b8);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES
+   ========================================================================== */
+html[data-theme="light"] .bns-checkout-panel,
+html[data-theme="light"] .bns-sticky-summary-card,
+html[data-theme="light"] .bns-order-metrics-card,
+html[data-theme="light"] .bns-delivery-instructions-card {
+  background: #ffffff !important;
+  border-color: rgba(17, 24, 39, 0.12) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+html[data-theme="light"] .bns-delivery-location-card {
+  background: rgba(184, 134, 59, 0.06) !important;
+  border-color: rgba(184, 134, 59, 0.25) !important;
+}
+
+html[data-theme="light"] .woocommerce form .form-row input.input-text,
+html[data-theme="light"] .woocommerce form .form-row select,
+html[data-theme="light"] .woocommerce form .form-row textarea {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .woocommerce form .form-row input.input-text:focus,
+html[data-theme="light"] .woocommerce form .form-row select:focus,
+html[data-theme="light"] .woocommerce form .form-row textarea:focus {
+  background: #ffffff !important;
+  border-color: #b8863b !important;
+}
+
+html[data-theme="light"] .bns-payment-method-item {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .bns-rental-specs-pill-group {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   DATE PICKER ICON VISIBILITY (DARK & LIGHT MODES)
+   ========================================================================== */
+.woocommerce form .form-row input[type="date"],
+input[type="date"] {
+  position: relative !important;
+  font-family: inherit !important;
+}
+
+html[data-theme="dark"] .woocommerce form .form-row input[type="date"],
+[data-theme="dark"] input[type="date"] {
+  color-scheme: dark !important;
+  background: var(--bns-bg-surface, #121318) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .woocommerce form .form-row input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.2) sepia(0.2) hue-rotate(15deg) !important;
+  cursor: pointer !important;
+  opacity: 0.9 !important;
+  padding: 4px !important;
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
+}
+
+html[data-theme="dark"] .woocommerce form .form-row input[type="date"]::-webkit-calendar-picker-indicator:hover,
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
+}
+
+html[data-theme="light"] .woocommerce form .form-row input[type="date"],
+[data-theme="light"] input[type="date"] {
+  color-scheme: light !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] .woocommerce form .form-row input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none !important;
+  cursor: pointer !important;
+  opacity: 0.75 !important;
+}
+
