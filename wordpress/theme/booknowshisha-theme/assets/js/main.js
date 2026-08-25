@@ -13,7 +13,7 @@
     // 12. Customer Email Authentication System (Email Login, Sign-Up & Password Reset)
     // ------------------------------------------------------------------------
     var $authModal = $('#bns-auth-modal');
-    var ajaxEndpoint = (typeof bnsThemeData !== 'undefined' && bnsThemeData.ajaxUrl) ? bnsThemeData.ajaxUrl : '/wp-admin/admin-ajax.php';
+    var ajaxEndpoint = (typeof window.bnsThemeData !== 'undefined' && window.bnsThemeData.ajaxUrl) ? window.bnsThemeData.ajaxUrl : ((typeof window.bnsRentalData !== 'undefined' && window.bnsRentalData.ajaxUrl) ? window.bnsRentalData.ajaxUrl : (window.location.origin + '/wp-admin/admin-ajax.php'));
     var defaultNonce = (typeof bnsThemeData !== 'undefined' && bnsThemeData.authNonce) ? bnsThemeData.authNonce : '';
 
     function showAuthAlert(msg, type, isPage) {
@@ -258,10 +258,23 @@
             showAuthAlert(errMsg, 'error', isPage);
           }
         },
-        error: function() {
+        error: function(xhr) {
           $btn.prop('disabled', false).removeClass('is-loading');
           $btnText.text(origText);
-          showAuthAlert('Network error during sign-in. Please try again.', 'error', isPage);
+          var errMsg = 'Invalid email address or password.';
+          if (xhr) {
+            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+              errMsg = xhr.responseJSON.data.message;
+            } else if (xhr.responseText) {
+              try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) {
+                  errMsg = parsed.data.message;
+                }
+              } catch(e) {}
+            }
+          }
+          showAuthAlert(errMsg, 'error', isPage);
         }
       });
     });
@@ -344,10 +357,29 @@
             showAuthAlert(errMsg, 'error', isPage);
           }
         },
-        error: function() {
+        error: function(xhr) {
           $btn.prop('disabled', false).removeClass('is-loading');
           $btnText.text(origText);
-          showAuthAlert('Network error during registration. Please try again.', 'error', isPage);
+          var errMsg = 'Could not create account. Please try again.';
+          if (xhr) {
+            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+              errMsg = xhr.responseJSON.data.message;
+            } else if (xhr.responseText) {
+              try {
+                var parsed = JSON.parse(xhr.responseText);
+                if (parsed && parsed.data && parsed.data.message) {
+                  errMsg = parsed.data.message;
+                } else if (parsed && parsed.message) {
+                  errMsg = parsed.message;
+                }
+              } catch(e) {
+                if (xhr.status === 400 || xhr.responseText === '0') {
+                  errMsg = 'An account with this email may already exist, or the security session expired. Please sign in.';
+                }
+              }
+            }
+          }
+          showAuthAlert(errMsg, 'error', isPage);
         }
       });
     });

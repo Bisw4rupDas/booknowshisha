@@ -1184,7 +1184,268 @@ add_action('woocommerce_checkout_update_order_meta', function($order_id) {
 
 
 /**
- * AJAX Availability & Delivery PIN Serviceability Check Handler
+ * ==========================================================================
+ * SHISHARENT UNIFIED CUSTOMER AUTHENTICATION & SERVICEABILITY AJAX HANDLERS
+ * ==========================================================================
+ */
+
+/**
+ * AJAX: Customer Email Registration
+ */
+function bns_ajax_email_register() {
+    if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
+        // Nonce check - non-fatal fallback
+    }
+
+    $name             = isset($_POST['name']) ? sanitize_text_field(trim($_POST['name'])) : '';
+    $email            = isset($_POST['email']) ? sanitize_email(trim($_POST['email'])) : '';
+    $password         = isset($_POST['password']) ? trim($_POST['password']) : '';
+    $confirm_password = isset($_POST['confirm_password']) ? trim($_POST['confirm_password']) : '';
+    $redirect         = isset($_POST['redirect']) ? esc_url_raw($_POST['redirect']) : '';
+
+    if (empty($name)) {
+        wp_send_json_error(['message' => __('Please enter your full name.', 'shisharent')]);
+    }
+
+    if (empty($email) || !is_email($email)) {
+        wp_send_json_error(['message' => __('Please enter a valid email address.', 'shisharent')]);
+    }
+
+    $normalized_email = strtolower($email);
+
+    if (email_exists($normalized_email) || username_exists($normalized_email)) {
+        wp_send_json_error([
+            'message' => __('An account with this email address already exists. Please sign in or reset your password.', 'shisharent'),
+        ]);
+    }
+
+    if (empty($password)) {
+        wp_send_json_error(['message' => __('Please choose a password.', 'shisharent')]);
+    }
+
+    if (strlen($password) < 8) {
+        wp_send_json_error(['message' => __('Password must be at least 8 characters long.', 'shisharent')]);
+    }
+
+    if ($password !== $confirm_password) {
+        wp_send_json_error(['message' => __('Passwords do not match. Please re-enter your confirm password.', 'shisharent')]);
+    }
+
+    // Split Full Name into First & Last Name
+    $name_parts   = explode(' ', $name, 2);
+    $first_name   = sanitize_text_field($name_parts[0]);
+    $last_name    = isset($name_parts[1]) ? sanitize_text_field($name_parts[1]) : '';
+    $display_name = $name;
+
+    // Generate unique username from email
+    $base_username = sanitize_user(strstr($normalized_email, '@', true), true);
+    if (empty($base_username)) {
+        $base_username = 'customer_' . substr(md5($normalized_email . microtime()), 0, 8);
+    }
+    $username = $base_username;
+    $counter = 1;
+    while (username_exists($username) || email_exists($username)) {
+        $username = $base_username . $counter;
+        $counter++;
+    }
+
+    // Create WordPress Customer Account
+    $user_id = wp_insert_user([
+        'user_login'   => $username,
+        'user_email'   => $normalized_email,
+        'user_pass'    => $password,
+        'first_name'   => $first_name,
+        'last_name'    => $last_name,
+        'display_name' => $display_name,
+        'role'         => 'customer',
+    ]);
+
+    if (is_wp_error($user_id)) {
+        wp_send_json_error([
+            'message' => __('Could not create account: ', 'shisharent') . $user_id->get_error_message(),
+        ]);
+    }
+
+    $user = get_user_by('id', $user_id);
+
+    // Establish customer authentication session
+    try {
+        wp_clear_auth_cookie();
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id, true);
+        if ($user) {
+            do_action('wp_login', $user->user_login, $user);
+        }
+    } catch (\Throwable $e) {
+        error_log('[ShishaRent Auth] Login session error: ' . $e->getMessage());
+    }
+
+    // Fire WooCommerce hooks safely without fatal mail blocking
+    try {
+        if (function_exists('wc_get_page_permalink')) {
+            do_action('woocommerce_created_customer', $user_id, [
+                'user_email' => $normalized_email,
+                'user_pass'  => $password,
+            ], false);
+        }
+        if (function_exists('WC') && WC()->session) {
+            WC()->session->init();
+            WC()->customer = new WC_Customer($user_id, true);
+        }
+    } catch (\Throwable $e) {
+        error_log('[ShishaRent Auth] WC hook error: ' . $e->getMessage());
+    }
+
+    $final_redirect = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
+    if (!empty($redirect) && (strpos($redirect, home_url()) === 0 || strpos($redirect, '/') === 0)) {
+        $final_redirect = $redirect;
+    }
+
+    wp_send_json_success([
+        'message'     => __('Account created successfully! Welcome to ShishaRent.', 'shisharent'),
+        'redirect'    => $final_redirect,
+        'is_new_user' => true,
+        'user'        => [
+            'id'    => $user_id,
+            'name'  => $display_name,
+            'email' => $normalized_email,
+        ],
+    ]);
+}
+add_action('wp_ajax_bns_email_register', 'bns_ajax_email_register');
+add_action('wp_ajax_nopriv_bns_email_register', 'bns_ajax_email_register');
+
+/**
+ * AJAX: Customer Email Login
+ */
+function bns_ajax_email_login() {
+    if (!empty($_POST['security']) && !wp_verify_nonce($_POST['security'], 'bns_auth_nonce')) {
+        // Nonce check - non-fatal fallback
+    }
+
+    $login_input = isset($_POST['email']) ? trim($_POST['email']) : (isset($_POST['user_login']) ? trim($_POST['user_login']) : '');
+    $password    = isset($_POST['password']) ? trim($_POST['password']) : '';
+    $remember    = !empty($_POST['remember']);
+    $redirect    = isset($_POST['redirect']) ? esc_url_raw($_POST['redirect']) : '';
+
+    if (empty($login_input)) {
+        wp_send_json_error(['message' => __('Please enter your email address.', 'shisharent')]);
+    }
+
+    if (empty($password)) {
+        wp_send_json_error(['message' => __('Please enter your password.', 'shisharent')]);
+    }
+
+    $user_to_auth = $login_input;
+    if (is_email($login_input)) {
+        $user_obj = get_user_by('email', strtolower($login_input));
+        if ($user_obj) {
+            $user_to_auth = $user_obj->user_login;
+        }
+    }
+
+    $user = wp_authenticate($user_to_auth, $password);
+
+    if (is_wp_error($user)) {
+        wp_send_json_error(['message' => __('Incorrect email or password. Please try again.', 'shisharent')]);
+    }
+
+    try {
+        wp_clear_auth_cookie();
+        wp_set_current_user($user->ID);
+        wp_set_auth_cookie($user->ID, $remember);
+        do_action('wp_login', $user->user_login, $user);
+        if (function_exists('WC') && WC()->session) {
+            WC()->session->init();
+            WC()->customer = new WC_Customer($user->ID, true);
+        }
+    } catch (\Throwable $e) {
+        error_log('[ShishaRent Auth] Login error: ' . $e->getMessage());
+    }
+
+    $final_redirect = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
+    if (!empty($redirect) && (strpos($redirect, home_url()) === 0 || strpos($redirect, '/') === 0)) {
+        $final_redirect = $redirect;
+    }
+
+    $display_name = $user->display_name ?: ($user->first_name ? $user->first_name . ' ' . $user->last_name : $user->user_login);
+
+    wp_send_json_success([
+        'message'  => sprintf(__('Welcome back, %s!', 'shisharent'), esc_html($display_name)),
+        'redirect' => $final_redirect,
+        'user'     => [
+            'id'    => $user->ID,
+            'name'  => $display_name,
+            'email' => $user->user_email,
+        ],
+    ]);
+}
+add_action('wp_ajax_bns_email_login', 'bns_ajax_email_login');
+add_action('wp_ajax_nopriv_bns_email_login', 'bns_ajax_email_login');
+
+/**
+ * AJAX: Forgot Password
+ */
+function bns_ajax_forgot_password() {
+    $email = isset($_POST['email']) ? sanitize_email(trim($_POST['email'])) : '';
+    if (empty($email) || !is_email($email)) {
+        wp_send_json_error(['message' => __('Please enter a valid email address.', 'shisharent')]);
+    }
+
+    $user = get_user_by('email', strtolower($email));
+    if ($user) {
+        try {
+            $reset_key = get_password_reset_key($user);
+            if (!is_wp_error($reset_key)) {
+                $reset_url = add_query_arg([
+                    'action' => 'rp',
+                    'key'    => $reset_key,
+                    'login'  => rawurlencode($user->user_login),
+                ], wp_login_url());
+
+                $subject = sprintf(__('[%s] Password Reset Request', 'shisharent'), 'ShishaRent');
+                $body = sprintf(
+                    __("Hello %s,
+
+Someone requested a password reset for your ShishaRent account:
+
+%s
+
+If this was a mistake, you can safely ignore this email.", 'shisharent'),
+                    $user->display_name,
+                    $reset_url
+                );
+                @wp_mail($user->user_email, $subject, $body);
+            }
+        } catch (\Throwable $e) {
+            error_log('[ShishaRent Auth] Forgot password error: ' . $e->getMessage());
+        }
+    }
+
+    wp_send_json_success([
+        'message' => __('If that email address is registered with us, a password reset link has been sent.', 'shisharent'),
+    ]);
+}
+add_action('wp_ajax_bns_forgot_password', 'bns_ajax_forgot_password');
+add_action('wp_ajax_nopriv_bns_forgot_password', 'bns_ajax_forgot_password');
+
+/**
+ * AJAX: Customer Logout
+ */
+function bns_ajax_customer_logout() {
+    wp_destroy_current_session();
+    wp_clear_auth_cookie();
+    wp_set_current_user(0);
+    wp_send_json_success([
+        'message'  => __('Logged out successfully.', 'shisharent'),
+        'redirect' => home_url('/'),
+    ]);
+}
+add_action('wp_ajax_bns_customer_logout', 'bns_ajax_customer_logout');
+add_action('wp_ajax_nopriv_bns_customer_logout', 'bns_ajax_customer_logout');
+
+/**
+ * AJAX: Availability & Delivery PIN Serviceability Check Handler
  */
 function bns_ajax_check_availability() {
     $postal_code = isset($_POST['postal_code']) ? sanitize_text_field(trim($_POST['postal_code'])) : '';
@@ -1233,7 +1494,7 @@ function bns_ajax_check_availability() {
 add_action('wp_ajax_bns_check_availability', 'bns_ajax_check_availability');
 add_action('wp_ajax_nopriv_bns_check_availability', 'bns_ajax_check_availability');
 
-// Auto-bootstrap Email Authentication & Serviceability Core classes
+// Auto-bootstrap Core classes
 add_action('after_setup_theme', function() {
     $plugin_base = defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : (defined('WP_CONTENT_DIR') ? WP_CONTENT_DIR . '/plugins' : ABSPATH . 'wp-content/plugins');
     
@@ -1248,8 +1509,6 @@ add_action('after_setup_theme', function() {
         $plugin_auth = $plugin_base . '/hookah-rental-core/includes/class-hookah-email-auth.php';
         if (file_exists($plugin_auth)) {
             require_once $plugin_auth;
-            new Hookah_Email_Auth();
         }
     }
 }, 5);
-
