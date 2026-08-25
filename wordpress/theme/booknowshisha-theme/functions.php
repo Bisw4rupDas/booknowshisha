@@ -66,7 +66,40 @@ function bns_force_inr_currency_symbol($currency_symbol, $currency) {
 }
 add_filter('woocommerce_currency_symbol', 'bns_force_inr_currency_symbol', 999, 2);
 
+/**
+ * Permanently disable WooCommerce Coming Soon / Site Visibility restrictions
+ */
+add_filter('woocommerce_is_coming_soon', '__return_false', 9999);
+add_filter('woocommerce_show_coming_soon_banner', '__return_false', 9999);
+add_filter('woocommerce_coming_soon_exclude', '__return_true', 9999);
+
 function bns_configure_woocommerce_defaults() {
+    // 1. Force Live Mode (Disable Coming Soon Mode)
+    if (get_option('woocommerce_coming_soon') !== 'no') {
+        update_option('woocommerce_coming_soon', 'no');
+    }
+    if (get_option('woocommerce_store_pages_only') !== 'no') {
+        update_option('woocommerce_store_pages_only', 'no');
+    }
+    if (get_option('woocommerce_coming_soon_banner') !== 'no') {
+        update_option('woocommerce_coming_soon_banner', 'no');
+    }
+
+    // 2. Ensure Cart & Checkout & MyAccount Page IDs are linked
+    $cart_page = get_page_by_path('cart');
+    if ($cart_page && get_option('woocommerce_cart_page_id') != $cart_page->ID) {
+        update_option('woocommerce_cart_page_id', $cart_page->ID);
+    }
+    $checkout_page = get_page_by_path('checkout');
+    if ($checkout_page && get_option('woocommerce_checkout_page_id') != $checkout_page->ID) {
+        update_option('woocommerce_checkout_page_id', $checkout_page->ID);
+    }
+    $myaccount_page = get_page_by_path('my-account');
+    if ($myaccount_page && get_option('woocommerce_myaccount_page_id') != $myaccount_page->ID) {
+        update_option('woocommerce_myaccount_page_id', $myaccount_page->ID);
+    }
+
+    // 3. Force Indian Rupee (INR / ₹) Currency Configuration
     if (get_option('woocommerce_currency') !== 'INR') {
         update_option('woocommerce_currency', 'INR');
         update_option('woocommerce_currency_pos', 'left');

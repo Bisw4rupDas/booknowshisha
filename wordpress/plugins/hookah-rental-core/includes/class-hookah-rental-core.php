@@ -32,6 +32,11 @@ class Hookah_Rental_Core {
     }
 
     public function run() {
+        // Disable WooCommerce Coming Soon mode
+        add_filter('woocommerce_is_coming_soon', '__return_false', 9999);
+        add_filter('woocommerce_show_coming_soon_banner', '__return_false', 9999);
+        add_filter('woocommerce_coming_soon_exclude', '__return_true', 9999);
+
         $i18n = new Hookah_Rental_i18n();
         add_action('plugins_loaded', [$i18n, 'load_plugin_textdomain']);
 
