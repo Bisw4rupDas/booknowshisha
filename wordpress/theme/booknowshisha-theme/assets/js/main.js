@@ -9,6 +9,65 @@
 
   $(document).ready(function() {
 
+    // ========================================================================
+    // 0. LUXURY THEME CONTROLLER (LIGHT / DARK MODE SWITCHER)
+    // ========================================================================
+    function getPreferredTheme() {
+      try {
+        var stored = localStorage.getItem('shisharent_theme');
+        if (stored === 'light' || stored === 'dark') {
+          return stored;
+        }
+      } catch (e) {}
+      var domTheme = document.documentElement.getAttribute('data-theme');
+      if (domTheme === 'light' || domTheme === 'dark') {
+        return domTheme;
+      }
+      return 'dark'; // Default luxury dark mode
+    }
+
+    function applyTheme(theme, persist) {
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = 'dark';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+      if (persist) {
+        try {
+          localStorage.setItem('shisharent_theme', theme);
+        } catch (e) {}
+      }
+      var isDark = (theme === 'dark');
+      $('.bns-theme-toggle').each(function() {
+        var $btn = $(this);
+        $btn.attr('aria-checked', isDark ? 'true' : 'false');
+        $btn.attr('title', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+      });
+      $(document).trigger('shisharent_theme_changed', [theme]);
+    }
+
+    // Initialize and sync UI state immediately
+    var activeTheme = getPreferredTheme();
+    applyTheme(activeTheme, false);
+
+    // Global Click Handler for Desktop, Mobile Drawer, and Inline Theme Toggles
+    $(document).on('click', '#bns-theme-toggle, #bns-theme-toggle-mobile, .bns-theme-toggle', function(e) {
+      e.preventDefault();
+      var current = document.documentElement.getAttribute('data-theme') || 'dark';
+      var next = (current === 'dark') ? 'light' : 'dark';
+      applyTheme(next, true);
+    });
+
+    // Keyboard support (Space / Enter key) for accessibility
+    $(document).on('keydown', '#bns-theme-toggle, #bns-theme-toggle-mobile, .bns-theme-toggle', function(e) {
+      if (e.key === ' ' || e.key === 'Enter' || e.keyCode === 32 || e.keyCode === 13) {
+        e.preventDefault();
+        var current = document.documentElement.getAttribute('data-theme') || 'dark';
+        var next = (current === 'dark') ? 'light' : 'dark';
+        applyTheme(next, true);
+      }
+    });
+
+
       // ------------------------------------------------------------------------
     // 12. Customer Email Authentication System (Email Login, Sign-Up & Password Reset)
     // ------------------------------------------------------------------------
