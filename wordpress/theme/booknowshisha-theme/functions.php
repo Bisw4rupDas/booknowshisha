@@ -1182,13 +1182,74 @@ add_action('woocommerce_checkout_update_order_meta', function($order_id) {
     }
 }, 10, 1);
 
-// Auto-bootstrap Email Authentication if plugin is inactive
+
+/**
+ * AJAX Availability & Delivery PIN Serviceability Check Handler
+ */
+function bns_ajax_check_availability() {
+    $postal_code = isset($_POST['postal_code']) ? sanitize_text_field(trim($_POST['postal_code'])) : '';
+    if (empty($postal_code)) {
+        wp_send_json_error(['message' => __('Please enter a 6-digit PIN code.', 'shisharent')]);
+    }
+
+    if (class_exists('Hookah_Serviceability')) {
+        $result = Hookah_Serviceability::check_pin_serviceability($postal_code);
+        wp_send_json_success($result);
+    } else {
+        $clean_pin = preg_replace('/[^0-9]/', '', $postal_code);
+        if (strlen($clean_pin) !== 6) {
+            wp_send_json_error(['message' => __('Invalid PIN format. Please enter a 6-digit PIN.', 'shisharent')]);
+        }
+        $is_kolkata = (strpos($clean_pin, '700') === 0);
+        $is_24p     = (strpos($clean_pin, '743') === 0);
+        if ($is_kolkata || $is_24p) {
+            $district = $is_kolkata ? 'Kolkata' : 'North 24 Parganas';
+            wp_send_json_success([
+                'deliverable'      => true,
+                'serviceable'      => true,
+                'pin'              => $clean_pin,
+                'district'         => $district,
+                'state'            => 'West Bengal',
+                'area'             => 'Kolkata Metropolitan Area',
+                'zoneName'         => $district . ' Express Hub',
+                'message'          => sprintf(__('Delivery available in %s', 'shisharent'), $district),
+                'availableSlots'   => [
+                    ['id' => 'slot_12_15', 'timeWindow' => '12:00 PM – 03:00 PM (Afternoon Express)'],
+                    ['id' => 'slot_15_18', 'timeWindow' => '03:00 PM – 06:00 PM (Evening Prime)'],
+                    ['id' => 'slot_18_21', 'timeWindow' => '06:00 PM – 09:00 PM (Night Party Express)'],
+                    ['id' => 'slot_21_00', 'timeWindow' => '09:00 PM – 12:00 AM (Late Night VIP)'],
+                ],
+            ]);
+        } else {
+            wp_send_json_success([
+                'deliverable'      => false,
+                'serviceable'      => false,
+                'pin'              => $clean_pin,
+                'message'          => sprintf(__('Delivery not available for PIN %s. ShishaRent currently delivers exclusively within Kolkata, North 24 Parganas and South 24 Parganas.', 'shisharent'), $clean_pin),
+            ]);
+        }
+    }
+}
+add_action('wp_ajax_bns_check_availability', 'bns_ajax_check_availability');
+add_action('wp_ajax_nopriv_bns_check_availability', 'bns_ajax_check_availability');
+
+// Auto-bootstrap Email Authentication & Serviceability Core classes
 add_action('after_setup_theme', function() {
+    $plugin_base = defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : (defined('WP_CONTENT_DIR') ? WP_CONTENT_DIR . '/plugins' : ABSPATH . 'wp-content/plugins');
+    
+    if (!class_exists('Hookah_Serviceability')) {
+        $svc_file = $plugin_base . '/hookah-rental-core/includes/class-hookah-serviceability.php';
+        if (file_exists($svc_file)) {
+            require_once $svc_file;
+        }
+    }
+
     if (!class_exists('Hookah_Email_Auth')) {
-        $plugin_auth = WP_PLUGIN_DIR . '/hookah-rental-core/includes/class-hookah-email-auth.php';
+        $plugin_auth = $plugin_base . '/hookah-rental-core/includes/class-hookah-email-auth.php';
         if (file_exists($plugin_auth)) {
             require_once $plugin_auth;
             new Hookah_Email_Auth();
         }
     }
 }, 5);
+

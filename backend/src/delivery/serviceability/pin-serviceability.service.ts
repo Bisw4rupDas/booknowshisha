@@ -64,7 +64,25 @@ export class PinServiceabilityService {
       };
     }
 
-    // 2. Known Postal Division Prefixes for neighboring non-serviceable districts & regions
+    // 2. Authoritative Kolkata (700xxx) and 24 Parganas (743xxx) Whole-District Coverage
+    if (cleanPin.startsWith('700')) {
+      return {
+        pin: cleanPin,
+        district: 'Kolkata',
+        state: 'West Bengal',
+        area: 'Kolkata Metropolitan Area',
+      };
+    }
+    if (cleanPin.startsWith('743')) {
+      return {
+        pin: cleanPin,
+        district: 'North 24 Parganas',
+        state: 'West Bengal',
+        area: '24 Parganas Postal Division',
+      };
+    }
+
+    // 3. Known Postal Division Prefixes for neighboring non-serviceable districts & regions
     // (Ensures explicit district mapping even for unlisted specific sub-offices)
     if (cleanPin.startsWith('711')) {
       return { pin: cleanPin, district: 'Howrah', state: 'West Bengal', area: 'Howrah Postal Division' };

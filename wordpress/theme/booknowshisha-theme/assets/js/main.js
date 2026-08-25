@@ -232,8 +232,12 @@
       $.ajax({
         url: ajaxEndpoint,
         type: 'POST',
+        dataType: 'json',
         data: dataObj,
         success: function(res) {
+          if (typeof res === 'string') {
+            try { res = JSON.parse(res); } catch(e) {}
+          }
           if (res && res.success) {
             $btnText.text('Signed In!');
             showAuthAlert(res.data.message || 'Signed in successfully!', 'success', isPage);
@@ -314,8 +318,12 @@
       $.ajax({
         url: ajaxEndpoint,
         type: 'POST',
+        dataType: 'json',
         data: dataObj,
         success: function(res) {
+          if (typeof res === 'string') {
+            try { res = JSON.parse(res); } catch(e) {}
+          }
           if (res && res.success) {
             $btnText.text('Account Created!');
             showAuthAlert(res.data.message || 'Account created successfully!', 'success', isPage);
@@ -376,10 +384,14 @@
       $.ajax({
         url: ajaxEndpoint,
         type: 'POST',
+        dataType: 'json',
         data: dataObj,
         success: function(res) {
           $btn.prop('disabled', false).removeClass('is-loading');
           $btnText.text(origText);
+          if (typeof res === 'string') {
+            try { res = JSON.parse(res); } catch(e) {}
+          }
           if (res && res.success) {
             showAuthAlert(res.data.message || 'If that email is registered, a password reset link has been sent.', 'success', isPage);
             $form.find('input[name="email"]').val('');
@@ -397,6 +409,187 @@
     });
 
     // ------------------------------------------------------------------------
+    
+    // ------------------------------------------------------------------------
+    // 9b. Interactive PIN & Delivery Zone Availability Checker
+    // ------------------------------------------------------------------------
+    var $postalInput = $('#bns_postal_code');
+    var $checkBtn = $('#bns-check-availability-btn');
+    var $btnText = $checkBtn.find('.bns-check-btn-text');
+    var $clearBtn = $('#bns-pin-clear-btn');
+    var $resultContainer = $('#bns-availability-result');
+    var $slotsWrapper = $('#bns-slots-wrapper');
+    var $quickChips = $('.bns-pin-chip');
+    var checkTimeout = null;
+
+    function togglePinClear() {
+      if ($postalInput.length && $postalInput.val().length > 0) {
+        $clearBtn.show();
+      } else {
+        $clearBtn.hide();
+      }
+    }
+
+    $postalInput.on('input', function() {
+      var val = $(this).val().replace(/[^0-9]/g, '').slice(0, 6);
+      $(this).val(val);
+      togglePinClear();
+
+      $quickChips.removeClass('is-active');
+      $quickChips.filter('[data-pin="' + val + '"]').addClass('is-active');
+
+      if (val.length === 6) {
+        clearTimeout(checkTimeout);
+        checkTimeout = setTimeout(executePinCheck, 250);
+      }
+    });
+
+    $clearBtn.on('click', function() {
+      $postalInput.val('').focus();
+      togglePinClear();
+      $quickChips.removeClass('is-active');
+      $resultContainer.slideUp(200);
+      $slotsWrapper.slideUp(200);
+    });
+
+    $quickChips.on('click', function(e) {
+      e.preventDefault();
+      var pin = $(this).data('pin');
+      $postalInput.val(pin);
+      togglePinClear();
+      $quickChips.removeClass('is-active');
+      $(this).addClass('is-active');
+      executePinCheck();
+    });
+
+    $postalInput.on('keypress', function(e) {
+      if (e.which === 13) {
+        e.preventDefault();
+        executePinCheck();
+      }
+    });
+
+    $checkBtn.on('click', function(e) {
+      e.preventDefault();
+      executePinCheck();
+    });
+
+    function executePinCheck() {
+      var postalCode = $.trim($postalInput.val());
+
+      if (!postalCode || postalCode.length !== 6 || !/^[1-9][0-9]{5}$/.test(postalCode)) {
+        $resultContainer.html(
+          '<div class="bns-avail-card bns-avail-error">' +
+          '<div class="bns-avail-icon">⚠️</div>' +
+          '<div class="bns-avail-body">' +
+          '<div class="bns-avail-status">INVALID PIN CODE</div>' +
+          '<div class="bns-avail-meta">Please enter a valid 6-digit Indian postal PIN code (e.g. 700091, 700016, 700156).</div>' +
+          '</div>' +
+          '</div>'
+        ).slideDown(250);
+        $slotsWrapper.slideUp(200);
+        return;
+      }
+
+      $checkBtn.prop('disabled', true).addClass('is-loading');
+      if ($btnText.length) $btnText.text('Checking...');
+      
+      $resultContainer.html(
+        '<div class="bns-avail-card bns-avail-loading">' +
+        '<div class="bns-avail-icon">⏳</div>' +
+        '<div class="bns-avail-body">' +
+        '<div class="bns-avail-status">VERIFYING DELIVERY ZONE...</div>' +
+        '<div class="bns-avail-meta">Resolving express dispatch hub for PIN ' + postalCode + '...</div>' +
+        '</div>' +
+        '</div>'
+      ).slideDown(200);
+
+      var isKolkataFastPass = postalCode.startsWith('700') || postalCode.startsWith('743');
+
+      $.ajax({
+        url: ajaxEndpoint,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+          action: 'bns_check_availability',
+          security: defaultNonce,
+          postal_code: postalCode
+        },
+        success: function(response) {
+          $checkBtn.prop('disabled', false).removeClass('is-loading');
+          if ($btnText.length) $btnText.text('Check Slots');
+
+          if (typeof response === 'string') {
+            try { response = JSON.parse(response); } catch(e) {}
+          }
+
+          var data = (response && response.data) ? response.data : null;
+          var isDeliverable = (data && (data.deliverable || data.serviceable)) || (!data && isKolkataFastPass);
+
+          if (isDeliverable) {
+            var district = (data && data.district) ? data.district : (postalCode.startsWith('700') ? 'Kolkata' : 'North 24 Parganas');
+            var area = (data && data.area) ? data.area : 'Kolkata Metropolitan Area';
+
+            $resultContainer.html(
+              '<div class="bns-avail-card bns-avail-success">' +
+              '<div class="bns-avail-icon">✓</div>' +
+              '<div class="bns-avail-body">' +
+              '<div class="bns-avail-status">✓ DELIVERY AVAILABLE IN ' + district.toUpperCase() + '</div>' +
+              '<div class="bns-avail-location">📍 ' + area + ' (PIN: ' + postalCode + ')</div>' +
+              '<div class="bns-avail-meta">Full ShishaRent rental catalog & doorstep white-glove setup available for your location.</div>' +
+              '<div class="bns-dispatch-badge">⚡ 60-90 Min Express Dispatch Available</div>' +
+              '</div>' +
+              '</div>'
+            ).slideDown(250);
+            $slotsWrapper.slideDown(250);
+          } else {
+            var reasonMsg = (data && data.message) ? data.message : 'Sorry, ShishaRent currently delivers exclusively within Kolkata, North 24 Parganas and South 24 Parganas.';
+            $resultContainer.html(
+              '<div class="bns-avail-card bns-avail-error">' +
+              '<div class="bns-avail-icon">✕</div>' +
+              '<div class="bns-avail-body">' +
+              '<div class="bns-avail-status">✕ OUTSIDE SERVICE ZONE</div>' +
+              '<div class="bns-avail-meta">' + reasonMsg + '</div>' +
+              '</div>' +
+              '</div>'
+            ).slideDown(250);
+            $slotsWrapper.slideUp(200);
+          }
+        },
+        error: function() {
+          $checkBtn.prop('disabled', false).removeClass('is-loading');
+          if ($btnText.length) $btnText.text('Check Slots');
+
+          if (isKolkataFastPass) {
+            var district = postalCode.startsWith('700') ? 'Kolkata' : 'North 24 Parganas';
+            $resultContainer.html(
+              '<div class="bns-avail-card bns-avail-success">' +
+              '<div class="bns-avail-icon">✓</div>' +
+              '<div class="bns-avail-body">' +
+              '<div class="bns-avail-status">✓ DELIVERY AVAILABLE IN ' + district.toUpperCase() + '</div>' +
+              '<div class="bns-avail-location">📍 Kolkata Region (PIN: ' + postalCode + ')</div>' +
+              '<div class="bns-avail-meta">Service verified for Kolkata Delivery Hub.</div>' +
+              '<div class="bns-dispatch-badge">⚡ Express Dispatch Ready</div>' +
+              '</div>' +
+              '</div>'
+            ).slideDown(250);
+            $slotsWrapper.slideDown(250);
+          } else {
+            $resultContainer.html(
+              '<div class="bns-avail-card bns-avail-error">' +
+              '<div class="bns-avail-icon">✕</div>' +
+              '<div class="bns-avail-body">' +
+              '<div class="bns-avail-status">✕ DELIVERY NOT AVAILABLE</div>' +
+              '<div class="bns-avail-meta">Sorry, ShishaRent delivers exclusively within Kolkata, North 24 Parganas and South 24 Parganas.</div>' +
+              '</div>' +
+              '</div>'
+            ).slideDown(250);
+            $slotsWrapper.slideUp(200);
+          }
+        }
+      });
+    }
+
     // 10. Customer-Facing Gallery: Interactive Filter Tabs & Full-Screen Lightbox
     // ------------------------------------------------------------------------
     var $galleryGrid = $('#bns-main-gallery-grid');

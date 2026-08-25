@@ -272,6 +272,14 @@ class Hookah_Serviceability {
             return array_merge(['pin' => $clean_pin], self::$pin_directory[$clean_pin]);
         }
 
+        // Authoritative Kolkata (700xxx) and 24 Parganas (743xxx) Range Coverage
+        if (str_starts_with($clean_pin, '700')) {
+            return ['pin' => $clean_pin, 'district' => 'Kolkata', 'state' => 'West Bengal', 'area' => 'Kolkata Metropolitan Area'];
+        }
+        if (str_starts_with($clean_pin, '743')) {
+            return ['pin' => $clean_pin, 'district' => 'North 24 Parganas', 'state' => 'West Bengal', 'area' => '24 Parganas Postal Division'];
+        }
+
         // Division prefixes
         if (str_starts_with($clean_pin, '711')) {
             return ['pin' => $clean_pin, 'district' => 'Howrah', 'state' => 'West Bengal', 'area' => 'Howrah Postal Division'];

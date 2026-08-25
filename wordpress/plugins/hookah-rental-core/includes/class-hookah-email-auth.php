@@ -221,23 +221,37 @@ class Hookah_Email_Auth {
         $user = get_user_by('id', $user_id);
 
         // Establish WordPress customer session immediately
-        wp_clear_auth_cookie();
-        wp_set_current_user($user_id);
-        wp_set_auth_cookie($user_id, true);
-        do_action('wp_login', $user->user_login, $user);
+        try {
+            wp_clear_auth_cookie();
+            wp_set_current_user($user_id);
+            wp_set_auth_cookie($user_id, true);
+            if ($user) {
+                do_action('wp_login', $user->user_login, $user);
+            }
+        } catch (\Throwable $e) {
+            error_log('[ShishaRent Auth] Login session exception: ' . $e->getMessage());
+        }
 
-        // Fire WooCommerce Customer Created Hook
-        if (function_exists('wc_get_page_permalink')) {
-            do_action('woocommerce_created_customer', $user_id, [
-                'user_email' => $normalized_email,
-                'user_pass'  => $password,
-            ], true);
+        // Fire WooCommerce Customer Created Hook safely
+        try {
+            if (function_exists('wc_get_page_permalink')) {
+                do_action('woocommerce_created_customer', $user_id, [
+                    'user_email' => $normalized_email,
+                    'user_pass'  => $password,
+                ], false);
+            }
+        } catch (\Throwable $e) {
+            error_log('[ShishaRent Auth] WC hook exception: ' . $e->getMessage());
         }
 
         // Synchronize WooCommerce Customer Session
-        if (function_exists('WC') && WC()->session) {
-            WC()->session->init();
-            WC()->customer = new WC_Customer($user_id, true);
+        try {
+            if (function_exists('WC') && WC()->session) {
+                WC()->session->init();
+                WC()->customer = new WC_Customer($user_id, true);
+            }
+        } catch (\Throwable $e) {
+            error_log('[ShishaRent Auth] WC customer session exception: ' . $e->getMessage());
         }
 
         // Determine Redirect URL
