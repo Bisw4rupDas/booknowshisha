@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+﻿import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require('supertest');
@@ -203,32 +203,24 @@ describe('Complete ShishaRent Rental Lifecycle (E2E Integration)', () => {
       expect(adminToken).toBeDefined();
     });
 
-    it('GET /api/auth/google/status - should report Google OAuth placeholder configuration status cleanly', async () => {
+    it('POST /api/auth/login - should reject invalid password with 401 Unauthorized', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({
+          email: adminEmail,
+          password: 'IncorrectPassword123!',
+        })
+        .expect(401);
+    });
+
+    it('GET /api/auth/me - should retrieve authenticated user profile with JWT token', async () => {
       const res = await request(app.getHttpServer())
-        .get('/api/auth/google/status')
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(res.body).toHaveProperty('configured');
-      expect(res.body).toHaveProperty('message');
-      expect(res.body.configured).toBe(false);
-      expect(res.body.message).toContain('Google Sign-In is not configured yet');
-    });
-
-    it('GET /api/auth/google - should return 503 Service Unavailable when credentials are placeholders', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/api/auth/google')
-        .expect(503);
-
-      expect(res.body.message).toContain('Google Sign-In is not configured yet');
-    });
-
-    it('POST /api/auth/google/verify - should return 503 Service Unavailable when credentials are not configured', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/api/auth/google/verify')
-        .send({ token: 'dummy-token' })
-        .expect(503);
-
-      expect(res.body.message).toContain('Google Sign-In is not configured yet');
+      expect(res.body).toHaveProperty('id');
+      expect(res.body.email).toBe(adminEmail);
     });
   });
 
@@ -526,3 +518,4 @@ describe('Complete ShishaRent Rental Lifecycle (E2E Integration)', () => {
     });
   });
 });
+

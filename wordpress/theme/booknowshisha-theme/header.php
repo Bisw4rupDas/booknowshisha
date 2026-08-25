@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Header template for ShishaRent Theme (Kolkata Edition)
  * Includes Light/Dark theme initialization and accessible theme toggle controls.
@@ -58,7 +58,7 @@
                         <!-- Services Dropdown -->
                         <li class="bns-nav-dropdown-parent">
                             <a href="<?php echo esc_url(home_url('/bartending-party-services/')); ?>" class="bns-dropdown-trigger <?php echo (is_page('bartending-party-services') || is_page('party-occasion-hookah')) ? 'active' : ''; ?>">
-                                <?php esc_html_e('SERVICES', 'shisharent'); ?> <span class="bns-dropdown-arrow">â–¾</span>
+                                <?php esc_html_e('SERVICES', 'shisharent'); ?> <span class="bns-dropdown-arrow">Ã¢â€“Â¾</span>
                             </a>
                             <ul class="bns-dropdown-menu">
                                 <li>
@@ -141,7 +141,7 @@
                     ?>
                     <!-- Account Dropdown Component -->
                     <div class="bns-account-dropdown-wrapper">
-                        <a href="<?php echo esc_url($account_url); ?>" class="bns-action-icon bns-account-trigger <?php echo $is_logged_in ? 'is-logged-in' : 'bns-trigger-google-login'; ?>" data-logged-in="<?php echo $is_logged_in ? '1' : '0'; ?>" title="<?php echo $is_logged_in ? esc_attr(sprintf(__('My Account (%s)', 'shisharent'), $user_name)) : esc_attr__('Sign In with Google', 'shisharent'); ?>" aria-label="<?php esc_attr_e('My Account', 'shisharent'); ?>" aria-haspopup="true" aria-expanded="false" id="bns-account-trigger">
+                        <a href="<?php echo esc_url($account_url); ?>" class="bns-action-icon bns-account-trigger <?php echo $is_logged_in ? 'is-logged-in' : 'bns-open-auth-btn'; ?>" data-logged-in="<?php echo $is_logged_in ? '1' : '0'; ?>" title="<?php echo $is_logged_in ? esc_attr(sprintf(__('My Account (%s)', 'shisharent'), $user_name)) : esc_attr__('Sign In', 'shisharent'); ?>" aria-label="<?php esc_attr_e('My Account', 'shisharent'); ?>" aria-haspopup="true" aria-expanded="false" id="bns-account-trigger">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
@@ -197,10 +197,10 @@
                                 <?php else: ?>
                                     <div class="bns-account-guest-header">
                                         <span class="bns-guest-badge"><?php esc_html_e('BOOKMYSMOKE ACCOUNT', 'shisharent'); ?></span>
-                                        <h4 class="bns-guest-title"><?php esc_html_e('Sign In with Google', 'shisharent'); ?></h4>
-                                        <p class="bns-guest-desc"><?php esc_html_e('Access your active hookah reservations, saved Kolkata addresses & fast Google sign-in.', 'shisharent'); ?></p>
-                                        <a href="#" class="button bns-btn-account-login bns-trigger-google-login">
-                                            <?php esc_html_e('SIGN IN WITH GOOGLE →', 'shisharent'); ?>
+                                        <h4 class="bns-guest-title"><?php esc_html_e('Sign In', 'shisharent'); ?></h4>
+                                        <p class="bns-guest-desc"><?php esc_html_e('Access your active hookah reservations, rental history & saved Kolkata delivery addresses.', 'shisharent'); ?></p>
+                                        <a href="#" class="button bns-btn-account-login bns-open-auth-btn">
+                                            <?php esc_html_e('SIGN IN →', 'shisharent'); ?>
                                         </a>
                                     </div>
                                     <div class="bns-account-guest-links">
@@ -255,7 +255,7 @@
                 <a href="<?php echo esc_url(home_url('/')); ?>" class="bns-drawer-logo" rel="home">
                     <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/logo.png?v=' . filemtime(get_template_directory() . '/assets/images/logo.png')); ?>" alt="<?php esc_attr_e('ShishaRent', 'shisharent'); ?>" class="bns-logo-img bns-drawer-logo-img" />
                 </a>
-                <button type="button" class="bns-drawer-close" id="bns-drawer-close" aria-label="<?php esc_attr_e('Close Menu', 'shisharent'); ?>">âœ•</button>
+                <button type="button" class="bns-drawer-close" id="bns-drawer-close" aria-label="<?php esc_attr_e('Close Menu', 'shisharent'); ?>">Ã¢Å“â€¢</button>
             </div>
 
             <!-- Mobile Theme Toggle Bar -->
@@ -309,10 +309,10 @@
                             <div class="bns-mobile-guest-text">
                                 <span class="bns-mobile-guest-tag"><?php esc_html_e('BOOKMYSMOKE VIP', 'shisharent'); ?></span>
                                 <strong><?php esc_html_e('Account & Reservations', 'shisharent'); ?></strong>
-                                <p><?php esc_html_e('Sign in with Google to track active rentals & saved addresses.', 'shisharent'); ?></p>
+                                <p><?php esc_html_e('Sign in to track active rentals & saved delivery addresses.', 'shisharent'); ?></p>
                             </div>
-                            <a href="#" class="bns-btn-mobile-login bns-trigger-google-login">
-                                <?php esc_html_e('SIGN IN WITH GOOGLE →', 'shisharent'); ?>
+                            <a href="#" class="bns-btn-mobile-login bns-open-auth-btn">
+                                <?php esc_html_e('SIGN IN →', 'shisharent'); ?>
                             </a>
                         </div>
                     <?php endif; ?>
@@ -361,3 +361,5 @@
 </header>
 
 <main id="bns-main-content" class="bns-site-main">
+
+

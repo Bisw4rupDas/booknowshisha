@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * The core plugin class orchestrating hooks and loader.
  *
@@ -28,7 +28,7 @@ class Hookah_Rental_Core {
         require_once HOOKAH_RENTAL_CORE_PATH . 'checkout/class-hookah-checkout-fields.php';
         require_once HOOKAH_RENTAL_CORE_PATH . 'availability/class-hookah-availability-checker.php';
         require_once HOOKAH_RENTAL_CORE_PATH . 'admin/class-hookah-admin-settings.php';
-        require_once HOOKAH_RENTAL_CORE_PATH . 'includes/class-hookah-google-auth.php';
+        require_once HOOKAH_RENTAL_CORE_PATH . 'includes/class-hookah-email-auth.php';
     }
 
     public function run() {
@@ -51,7 +51,7 @@ class Hookah_Rental_Core {
         $availability = new Hookah_Availability_Checker($this->plugin_name, $this->version);
         $availability->init_hooks();
 
-        $google_auth = new Hookah_Google_Auth();
+        $email_auth = new Hookah_Email_Auth();
 
         // Register Driver & Admin Portals
         add_action('template_redirect', [$this, 'handle_portal_routing']);

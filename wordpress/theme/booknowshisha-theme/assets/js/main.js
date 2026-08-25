@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ShishaRent Theme Main JavaScript
  * Full interactive controls: Theme switcher (Light/Dark mode), live filter, carousel, PIN checker, contact form, modal, and accordion.
  *
@@ -7,487 +7,241 @@
 (function($) {
   'use strict';
 
-  // --------------------------------------------------------------------------
-  // 0. Immediate Theme Mode Sync (Before & After DOM Ready)
-  // --------------------------------------------------------------------------
-  function getSavedTheme() {
-    try {
-      var saved = localStorage.getItem('shisharent_theme');
-      if (saved === 'dark' || saved === 'light') {
-        return saved;
-      }
-    } catch (e) {}
-    return 'dark';
-  }
-
-  function applyTheme(theme, showToastNotification) {
-    var isDark = (theme === 'dark');
-    document.documentElement.setAttribute('data-theme', theme);
-    try {
-      localStorage.setItem('shisharent_theme', theme);
-    } catch (e) {}
-
-    // Synchronize all toggle switches on page
-    $('.bns-theme-toggle, #bns-theme-toggle, #bns-theme-toggle-mobile').each(function() {
-      $(this).attr('aria-checked', isDark ? 'true' : 'false');
-    });
-
-    if (showToastNotification && typeof window.showBnsToast === 'function') {
-      if (isDark) {
-        window.showBnsToast('Gothic Luxury Mode', 'Switched to dramatic dark lounge aesthetic.', 'theme');
-      } else {
-        window.showBnsToast('Modern Luxury Mode', 'Switched to refined daytime aesthetic.', 'theme');
-      }
-    }
-  }
-
-  // Apply immediately
-  applyTheme(getSavedTheme(), false);
-
-  // Delegated theme toggle click handler (works anywhere, anytime)
-  $(document).on('click', '.bns-theme-toggle, #bns-theme-toggle, #bns-theme-toggle-mobile', function(e) {
-    e.preventDefault();
-    var current = document.documentElement.getAttribute('data-theme') || 'light';
-    var nextTheme = (current === 'dark') ? 'light' : 'dark';
-    applyTheme(nextTheme, true);
-  });
-
-  $(document).on('keydown', '.bns-theme-toggle, #bns-theme-toggle, #bns-theme-toggle-mobile', function(e) {
-    if (e.which === 13 || e.which === 32) { // Enter or Space
-      e.preventDefault();
-      var current = document.documentElement.getAttribute('data-theme') || 'light';
-      var nextTheme = (current === 'dark') ? 'light' : 'dark';
-      applyTheme(nextTheme, true);
-    }
-  });
-
   $(document).ready(function() {
 
-    // Ensure toggle UI is synchronized once DOM is ready
-    applyTheme(getSavedTheme(), false);
-
-    // ------------------------------------------------------------------------
-    // 1. Refined Toast Notification Utility (Clean & Professional)
-    // ------------------------------------------------------------------------
-    function showToast(title, message, type) {
-      type = type || 'info';
-      var $toastContainer = $('#bns-toast-container');
-      if (!$toastContainer.length) {
-        $toastContainer = $('<div id="bns-toast-container" style="position:fixed;top:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:12px;pointer-events:none;"></div>');
-        $('body').append($toastContainer);
-      }
-
-      var iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-      var borderColor = 'rgba(184,134,59,0.4)';
-      var iconColor = '#b8863b';
-
-      if (type === 'success') {
-        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-        borderColor = 'rgba(16,185,129,0.5)';
-        iconColor = '#10b981';
-      } else if (type === 'warning') {
-        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
-        borderColor = 'rgba(245,158,11,0.5)';
-        iconColor = '#f59e0b';
-      } else if (type === 'theme') {
-        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
-        borderColor = 'rgba(212,169,95,0.6)';
-        iconColor = '#d4a95f';
-      }
-
-      var isDark = $('html').attr('data-theme') === 'dark';
-      var bgStyle = isDark ? 'background:rgba(12,16,27,0.96);color:#f8fafc;' : 'background:rgba(255,255,255,0.98);color:#111827;';
-      var textMuted = isDark ? '#94a3b8' : '#4b5563';
-
-      var $toast = $(
-        '<div style="pointer-events:auto;min-width:300px;max-width:380px;' + bgStyle + 'border:1px solid ' + borderColor + ';box-shadow:0 12px 36px rgba(0,0,0,0.22);border-radius:10px;padding:14px 18px;font-family:Inter,sans-serif;font-size:0.86rem;display:flex;gap:14px;align-items:center;backdrop-filter:blur(12px);transform:translateX(100%);transition:all 0.3s cubic-bezier(0.16,1,0.3,1);">' +
-          '<div style="color:' + iconColor + ';display:flex;align-items:center;">' + iconSvg + '</div>' +
-          '<div style="flex:1;">' +
-            '<div style="font-weight:600;letter-spacing:0.3px;margin-bottom:2px;">' + title + '</div>' +
-            '<div style="color:' + textMuted + ';font-size:0.8rem;line-height:1.4;">' + message + '</div>' +
-          '</div>' +
-        '</div>'
-      );
-
-      $toastContainer.append($toast);
-      setTimeout(function() {
-        $toast.css('transform', 'translateX(0)');
-      }, 10);
-
-      setTimeout(function() {
-        $toast.css({ 'transform': 'translateX(120%)', 'opacity': '0' });
-        setTimeout(function() { $toast.remove(); }, 350);
-      }, 3500);
-    }
-    window.showBnsToast = showToast;
-
-    // ------------------------------------------------------------------------
-    // 2. Header Scroll Effect
-    // ------------------------------------------------------------------------
-    var $header = $('#bns-site-header');
-    $(window).on('scroll', function() {
-      if ($(window).scrollTop() > 30) {
-        $header.addClass('scrolled');
-      } else {
-        $header.removeClass('scrolled');
-      }
-    });
-
-    // ------------------------------------------------------------------------
-    // 3. Mobile Drawer Navigation
-    // ------------------------------------------------------------------------
-    var $drawer = $('#bns-mobile-drawer');
-    var $drawerToggle = $('#bns-mobile-toggle');
-    var $drawerClose = $('#bns-drawer-close');
-    var $drawerBackdrop = $('#bns-drawer-backdrop');
-
-    if ($drawerToggle.length) {
-      $drawerToggle.on('click', function(e) {
-        e.preventDefault();
-        $drawer.addClass('open');
-        $('body').css('overflow', 'hidden');
-      });
-    }
-
-    function closeDrawer() {
-      $drawer.removeClass('open');
-      $('body').css('overflow', '');
-    }
-
-    if ($drawerClose.length) $drawerClose.on('click', closeDrawer);
-    if ($drawerBackdrop.length) $drawerBackdrop.on('click', closeDrawer);
-    $('.bns-mobile-link').on('click', closeDrawer);
-
-    // ------------------------------------------------------------------------
-    // 4. Hero Hookah Centerpiece (Brand Logo is static and persistent)
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
-    // 5. Featured Catalog Category Tabs
-    // ------------------------------------------------------------------------
-    var $tabBtns = $('.bns-tab-btn');
-    var $productCards = $('.bns-product-card');
-
-    $tabBtns.on('click', function(e) {
-      e.preventDefault();
-      var selectedCategory = $(this).data('tab');
-
-      $tabBtns.removeClass('active');
-      $(this).addClass('active');
-
-      if (selectedCategory === 'all') {
-        $productCards.stop().fadeIn(250);
-      } else {
-        $productCards.each(function() {
-          var cardCats = $(this).data('category') || '';
-          if (cardCats.indexOf(selectedCategory) !== -1) {
-            $(this).stop().fadeIn(250);
-          } else {
-            $(this).stop().fadeOut(150);
-          }
-        });
-      }
-    });
-
-    // ------------------------------------------------------------------------
-    // 6. Featured Catalog Pagination Controls
-    // ------------------------------------------------------------------------
-    $('.bns-page-num').on('click', function() {
-      $('.bns-page-num').removeClass('active');
-      $(this).addClass('active');
-      var pageNumber = $(this).text();
-
-      $('html, body').animate({
-        scrollTop: $('#catalog').offset().top - 70
-      }, 400);
-    });
-
-    $('#bns-prev-page').on('click', function() {
-      var $current = $('.bns-page-num.active');
-      var $prev = $current.prev('.bns-page-num');
-      if ($prev.length) {
-        $prev.trigger('click');
-      }
-    });
-
-    $('#bns-next-page').on('click', function() {
-      var $current = $('.bns-page-num.active');
-      var $next = $current.next('.bns-page-num');
-      if ($next.length) {
-        $next.trigger('click');
-      }
-    });
-
-    // ------------------------------------------------------------------------
-    // 7. Interactive Flavour Selection Pill Cards
-    // ------------------------------------------------------------------------
-    $('.bns-flavour-pill-card').on('click', function() {
-      $(this).toggleClass('selected');
-      var flavourName = $(this).find('h4').text() || 'Flavour';
-      if ($(this).hasClass('selected')) {
-        $(this).css('border-color', 'var(--bns-accent-gold)');
-        showToast('Flavour Selected', flavourName + ' added to your session mix.', 'success');
-      } else {
-        $(this).css('border-color', '');
-        showToast('Flavour Removed', flavourName + ' unselected.', 'info');
-      }
-    });
-
-    // ------------------------------------------------------------------------
-    // 8. Delivery PIN Availability Checker (Strict 3-District Authority)
-    // ------------------------------------------------------------------------
-    function executePinCheck(pin) {
-      pin = (pin || '').toString().trim();
-      if (!pin || pin.length !== 6 || !/^\d{6}$/.test(pin)) {
-        showToast('Invalid PIN', 'Please enter a valid 6-digit PIN code (e.g. 700019, 700091, 700027).', 'warning');
-        $('#bns-pin-result').html(
-          '<div style="margin-top:14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px;color:#ef4444;font-size:0.85rem;display:flex;align-items:center;gap:8px;">' +
-            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>' +
-            '<span>Please enter a valid 6-digit numeric PIN code.</span>' +
-          '</div>'
-        ).slideDown(200);
-        return;
-      }
-
-      var $btn = $('#bns-pin-submit-btn, .bns-btn-check-pin');
-      var origText = $btn.text();
-      $btn.text('Checking...').prop('disabled', true);
-
-      // Perform request to NestJS backend check-zone
-      $.ajax({
-        url: 'http://localhost:3000/api/delivery/check-zone',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ postalCode: pin }),
-        success: function(response) {
-          $btn.text(origText).prop('disabled', false);
-          if (response && response.deliverable) {
-            var district = response.district || 'Kolkata';
-            showToast(
-              'Delivery Available',
-              district + ', West Bengal. You can proceed with your order.',
-              'success'
-            );
-            $('#bns-pin-result').html(
-              '<div style="margin-top:14px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;color:#10b981;font-size:0.88rem;display:flex;align-items:flex-start;gap:12px;">' +
-                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
-                '<div>' +
-                  '<strong style="font-size:0.92rem;color:#10b981;letter-spacing:0.5px;">DELIVERY AVAILABLE</strong><br>' +
-                  '<span style="color:var(--bns-text-primary);font-weight:600;">' + district + ', West Bengal</span>' + (response.area ? ' (' + response.area + ')' : '') + '<br>' +
-                  '<span style="color:var(--bns-text-muted);font-size:0.8rem;">Ready for immediate white-glove dispatch.</span>' +
-                '</div>' +
-              '</div>'
-            ).slideDown(200);
-          } else {
-            var errorMsg = (response && response.message) ? response.message : 'ShishaRent delivers strictly within Kolkata, North 24 Parganas and South 24 Parganas.';
-            showToast('Non-Serviceable Area', errorMsg, 'warning');
-            $('#bns-pin-result').html(
-              '<div style="margin-top:14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:14px;color:#ef4444;font-size:0.88rem;display:flex;align-items:flex-start;gap:12px;">' +
-                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' +
-                '<div>' +
-                  '<strong style="font-size:0.92rem;color:#ef4444;letter-spacing:0.5px;">DELIVERY NOT AVAILABLE</strong><br>' +
-                  '<span style="color:var(--bns-text-muted);font-size:0.82rem;">ShishaRent delivers strictly within Kolkata, North 24 Parganas, and South 24 Parganas.</span>' +
-                '</div>' +
-              '</div>'
-            ).slideDown(200);
-          }
-        },
-        error: function() {
-          $btn.text(origText).prop('disabled', false);
-          // Strict offline fallback adhering to 3-district rule
-          var kolkataPins = ['700001','700002','700003','700004','700005','700006','700007','700008','700009','700010','700011','700012','700013','700014','700015','700016','700017','700018','700019','700020','700021','700022','700023','700024','700025','700026','700029','700031','700033','700037','700039','700040','700045','700046','700047','700054','700062','700067','700068','700069','700071','700072','700073','700076','700077','700082','700085','700087','700092','700095','700105'];
-          var north24Pins = ['700028','700030','700035','700036','700048','700049','700050','700051','700052','700055','700056','700057','700058','700059','700064','700065','700074','700079','700080','700081','700083','700089','700090','700091','700097','700098','700101','700102','700106','700108','700109','700110','700111','700112','700113','700114','700115','700116','700117','700118','700119','700120','700121','700122','700123','700124','700125','700126','700127','700128','700129','700130','700131','700132','700133','700134','700135','700136','700156','700157','700158','700159','700160','700161','700162','743122','743125','743126','743144','743145','743165','743166','743221','743232','743234','743235','743245','743248','743263','743401','743411','743412','743422','743424','743427','743456'];
-          var south24Pins = ['700027','700032','700034','700038','700041','700042','700043','700044','700053','700060','700061','700063','700070','700075','700078','700084','700086','700088','700093','700094','700096','700099','700100','700103','700104','700107','700137','700138','700139','700140','700141','700142','700143','700144','700145','700146','700147','700148','700149','700150','700151','700152','700153','700154','700155','743302','743312','743318','743329','743331','743337','743347','743355','743372','743387'];
-
-          var district = null;
-          if (kolkataPins.indexOf(pin) !== -1) district = 'Kolkata';
-          else if (north24Pins.indexOf(pin) !== -1) district = 'North 24 Parganas';
-          else if (south24Pins.indexOf(pin) !== -1) district = 'South 24 Parganas';
-
-          if (district) {
-            showToast('Delivery Available', district + ', West Bengal. You can proceed with your order.', 'success');
-            $('#bns-pin-result').html(
-              '<div style="margin-top:14px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;color:#10b981;font-size:0.88rem;display:flex;align-items:flex-start;gap:12px;">' +
-                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
-                '<div>' +
-                  '<strong style="font-size:0.92rem;color:#10b981;letter-spacing:0.5px;">DELIVERY AVAILABLE</strong><br>' +
-                  '<span style="color:var(--bns-text-primary);font-weight:600;">' + district + ', West Bengal</span><br>' +
-                  '<span style="color:var(--bns-text-muted);font-size:0.8rem;">Ready for immediate white-glove dispatch.</span>' +
-                '</div>' +
-              '</div>'
-            ).slideDown(200);
-          } else {
-            showToast('Non-Serviceable Area', 'ShishaRent delivers strictly within Kolkata, North 24 Parganas and South 24 Parganas.', 'warning');
-            $('#bns-pin-result').html(
-              '<div style="margin-top:14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:14px;color:#ef4444;font-size:0.88rem;display:flex;align-items:flex-start;gap:12px;">' +
-                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' +
-                '<div>' +
-                  '<strong style="font-size:0.92rem;color:#ef4444;letter-spacing:0.5px;">DELIVERY NOT AVAILABLE</strong><br>' +
-                  '<span style="color:var(--bns-text-muted);font-size:0.82rem;">ShishaRent delivers strictly within Kolkata, North 24 Parganas, and South 24 Parganas.</span>' +
-                '</div>' +
-              '</div>'
-            ).slideDown(200);
-          }
-        }
-      });
-    }
-
-    $('#bns-pin-submit-btn, .bns-btn-check-pin').on('click', function(e) {
-      e.preventDefault();
-      var pin = $('#bns-pin-input').val() || $('.bns-pin-input').val();
-      executePinCheck(pin);
-    });
-
-    $('#bns-pin-input, .bns-pin-input').on('keypress', function(e) {
-      if (e.which === 13) {
-        e.preventDefault();
-        executePinCheck($(this).val());
-      }
-    });
-
-    // Quick PIN Pill Buttons
-    $('.bns-zone-tag').on('click', function() {
-      var pinText = $(this).text();
-      var match = pinText.match(/\b\d{6}\b/);
-      if (match && match[0]) {
-        $('#bns-pin-input, .bns-pin-input').val(match[0]);
-        executePinCheck(match[0]);
-      }
-    });
-
-    // ------------------------------------------------------------------------
-    // 9. Interactive Contact Form Submission Handler
-    // ------------------------------------------------------------------------
-    $('#bns-contact-form').on('submit', function(e) {
-      e.preventDefault();
-      var name = $('#contact-name').val();
-      var phone = $('#contact-phone').val();
-      var area = $('#contact-area').val() || 'Kolkata';
-      var service = $('#contact-service').val();
-      var message = $('#contact-message').val();
-
-      var formattedText = 'Hi ShishaRent Kolkata,\n\n' +
-        'Name: ' + name + '\n' +
-        'Phone: ' + phone + '\n' +
-        'Location: ' + area + '\n' +
-        'Service: ' + service + '\n' +
-        'Message: ' + message;
-
-      var waUrl = 'https://wa.me/919903556825?text=' + encodeURIComponent(formattedText);
-
-      // Open WhatsApp chat in new window
-      window.open(waUrl, '_blank');
-
-      $('#bns-contact-feedback').html(
-        '<div style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:12px;color:#10b981;font-size:0.88rem;display:flex;align-items:center;gap:10px;">' +
-          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
-          '<span>Thank you ' + name + '! Your inquiry has been forwarded to our WhatsApp concierge. Our team will reply shortly.</span>' +
-        '</div>'
-      ).slideDown(250);
-
-      showToast('Inquiry Sent', 'WhatsApp conversation initiated with ShishaRent concierge.', 'success');
-    });
-
-    // ------------------------------------------------------------------------
-    // 10. FAQ Accordion
-    // ------------------------------------------------------------------------
-    $('.bns-faq-question').on('click', function() {
-      var $parentItem = $(this).closest('.bns-faq-item');
-      var isActive = $parentItem.hasClass('active');
-
-      $('.bns-faq-item').removeClass('active');
-      if (!isActive) {
-        $parentItem.addClass('active');
-      }
-    });
-
-    // ------------------------------------------------------------------------
-    // 11. Smooth Scrolling for Internal Anchors
-    // ------------------------------------------------------------------------
-    $('a[href*="#"]').not('[href="#"]').not('[href="#0"]').on('click', function(e) {
-      if (
-        location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') &&
-        location.hostname === this.hostname
-      ) {
-        var target = $(this.hash);
-        target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-        if (target.length) {
-          e.preventDefault();
-          $('html, body').animate({
-            scrollTop: target.offset().top - 70
-          }, 600);
-        }
-      }
-    });
-
-    // ------------------------------------------------------------------------
-    // 12. Customer Google Authentication System (Mock & OAuth Ready)
+      // ------------------------------------------------------------------------
+    // 12. Customer Email Authentication System (Email Login, Sign-Up & Password Reset)
     // ------------------------------------------------------------------------
     var $authModal = $('#bns-auth-modal');
-
-    // Open Google Auth Modal from ANY customer login trigger when logged out
-    $(document).on('click', '#bns-account-trigger:not(.is-logged-in), .bns-account-trigger:not(.is-logged-in), .bns-btn-account-login, .bns-btn-mobile-login, .bns-open-auth-btn, .bns-trigger-google-login, .woocommerce-info a.showlogin, a.showlogin', function(e) {
-      // If on the /my-account/ in-page form itself, do not open modal
-      if ($('#bns-inpage-btn-google-auth').length && $('#bns-inpage-btn-google-auth').is(':visible')) {
-        return;
-      }
-
-      e.preventDefault();
-      if ($drawer.length) {
-        $drawer.removeClass('open');
-        $('body').css('overflow', '');
-      }
-      $('.bns-account-dropdown-menu').removeClass('is-open');
-      $('#bns-auth-alert').hide().text('');
-      $authModal.css('display', 'flex').hide().fadeIn(200);
-    });
-
-    // Close Auth Modal
-    $(document).on('click', '#bns-auth-close, #bns-auth-backdrop', function() {
-      $authModal.fadeOut(150);
-    });
-
-    // Close on Escape key
-    $(document).on('keydown', function(e) {
-      if ((e.key === 'Escape' || e.keyCode === 27) && $authModal.is(':visible')) {
-        $authModal.fadeOut(150);
-      }
-    });
+    var ajaxEndpoint = (typeof bnsThemeData !== 'undefined' && bnsThemeData.ajaxUrl) ? bnsThemeData.ajaxUrl : '/wp-admin/admin-ajax.php';
+    var defaultNonce = (typeof bnsThemeData !== 'undefined' && bnsThemeData.authNonce) ? bnsThemeData.authNonce : '';
 
     function showAuthAlert(msg, type, isPage) {
       var $alert = isPage ? $('#bns-inpage-auth-alert') : $('#bns-auth-alert');
       $alert.removeClass('bns-alert-error bns-alert-success')
         .addClass(type === 'success' ? 'bns-alert-success' : 'bns-alert-error')
-        .html(msg).fadeIn(200);
+        .html(msg).stop(true, true).fadeIn(200);
     }
 
-    // Google Sign-In Execution (Supports Mock Dev & Real ID Token)
-    $(document).on('click', '#bns-btn-google-auth, #bns-inpage-btn-google-auth', function(e) {
+    function hideAuthAlert(isPage) {
+      var $alert = isPage ? $('#bns-inpage-auth-alert') : $('#bns-auth-alert');
+      $alert.hide().html('');
+    }
+
+    function switchModalView(view) {
+      hideAuthAlert(false);
+      $('#bns-view-signin, #bns-view-signup, #bns-view-forgot').hide();
+      var $title = $('#bns-modal-title');
+      var $subtitle = $('#bns-modal-subtitle');
+      var $tabs = $('#bns-modal-tabs-wrap');
+      var $tabSignIn = $('#bns-tab-btn-signin');
+      var $tabSignUp = $('#bns-tab-btn-signup');
+
+      if (view === 'signup') {
+        $tabs.show();
+        $tabSignIn.removeClass('active');
+        $tabSignUp.addClass('active');
+        $('#bns-view-signup').stop(true, true).fadeIn(150);
+        $title.text('CREATE ACCOUNT');
+        $subtitle.text('Create your BookMySmoke account to manage hookah rentals and checkout faster.');
+      } else if (view === 'forgot') {
+        $tabs.hide();
+        $('#bns-view-forgot').stop(true, true).fadeIn(150);
+        $title.text('RESET PASSWORD');
+        $subtitle.text("Enter your email address and we'll send you a secure link to reset your password.");
+      } else {
+        $tabs.show();
+        $tabSignIn.addClass('active');
+        $tabSignUp.removeClass('active');
+        $('#bns-view-signin').stop(true, true).fadeIn(150);
+        $title.text('SIGN IN');
+        $subtitle.text('Welcome to BookMySmoke. Sign in to access your Kolkata reservations, track active rentals, and manage your account.');
+      }
+    }
+
+    function switchInpageView(view) {
+      hideAuthAlert(true);
+      $('#bns-inpage-view-signin, #bns-inpage-view-signup, #bns-inpage-view-forgot').hide();
+      var $title = $('#bns-inpage-auth-title');
+      var $subtitle = $('#bns-inpage-auth-subtitle');
+      var $tabs = $('#bns-inpage-tabs-wrap');
+      var $tabSignIn = $('#bns-inpage-tab-btn-signin');
+      var $tabSignUp = $('#bns-inpage-tab-btn-signup');
+
+      if (view === 'signup') {
+        $tabs.show();
+        $tabSignIn.removeClass('active');
+        $tabSignUp.addClass('active');
+        $('#bns-inpage-view-signup').stop(true, true).fadeIn(150);
+        $title.text('CREATE ACCOUNT');
+        $subtitle.text('Create your BookMySmoke account to manage hookah rentals and checkout faster.');
+      } else if (view === 'forgot') {
+        $tabs.hide();
+        $('#bns-inpage-view-forgot').stop(true, true).fadeIn(150);
+        $title.text('RESET PASSWORD');
+        $subtitle.text("Enter your email address and we'll send you a secure link to reset your password.");
+      } else {
+        $tabs.show();
+        $tabSignIn.addClass('active');
+        $tabSignUp.removeClass('active');
+        $('#bns-inpage-view-signin').stop(true, true).fadeIn(150);
+        $title.text('SIGN IN');
+        $subtitle.text('Welcome to BookMySmoke. Sign in to view active reservations, rental history, and manage your account.');
+      }
+    }
+
+    // Tab buttons in modal
+    $(document).on('click', '#bns-tab-btn-signin', function(e) {
+      e.preventDefault();
+      switchModalView('signin');
+    });
+
+    $(document).on('click', '#bns-tab-btn-signup', function(e) {
+      e.preventDefault();
+      switchModalView('signup');
+    });
+
+    // Tab buttons in in-page form
+    $(document).on('click', '#bns-inpage-tab-btn-signin', function(e) {
+      e.preventDefault();
+      switchInpageView('signin');
+    });
+
+    $(document).on('click', '#bns-inpage-tab-btn-signup', function(e) {
+      e.preventDefault();
+      switchInpageView('signup');
+    });
+
+    // Modal view switch links
+    $(document).on('click', '#bns-link-to-signup', function(e) {
+      e.preventDefault();
+      switchModalView('signup');
+    });
+
+    $(document).on('click', '#bns-link-to-forgot', function(e) {
+      e.preventDefault();
+      switchModalView('forgot');
+    });
+
+    $(document).on('click', '#bns-link-to-signin-from-signup, #bns-link-to-signin-from-forgot', function(e) {
+      e.preventDefault();
+      switchModalView('signin');
+    });
+
+    // In-page view switch links
+    $(document).on('click', '#bns-inpage-link-to-signup', function(e) {
+      e.preventDefault();
+      switchInpageView('signup');
+    });
+
+    $(document).on('click', '#bns-inpage-link-to-forgot', function(e) {
+      e.preventDefault();
+      switchInpageView('forgot');
+    });
+
+    $(document).on('click', '#bns-inpage-link-to-signin-from-signup, #bns-inpage-link-to-signin-from-forgot', function(e) {
+      e.preventDefault();
+      switchInpageView('signin');
+    });
+
+    // Open Email Auth Modal from customer login triggers when logged out
+    $(document).on('click', '#bns-account-trigger:not(.is-logged-in), .bns-account-trigger:not(.is-logged-in), .bns-btn-account-login, .bns-btn-mobile-login, .bns-open-auth-btn, .woocommerce-info a.showlogin, a.showlogin', function(e) {
+      if ($('#bns-inpage-form-signin').length && $('#bns-inpage-form-signin').is(':visible')) {
+        $('html, body').animate({
+          scrollTop: $('#bns-myaccount-auth-container').offset().top - 80
+        }, 400);
+        return;
+      }
+
+      e.preventDefault();
+      if (typeof $drawer !== 'undefined' && $drawer.length) {
+        $drawer.removeClass('open');
+        $('body').css('overflow', '');
+      }
+      $('.bns-account-dropdown-menu').removeClass('is-open');
+      switchModalView('signin');
+      $authModal.addClass('is-open').css('display', 'flex').hide().fadeIn(200);
+    });
+
+    // Close Auth Modal
+    $(document).on('click', '#bns-auth-close, #bns-auth-backdrop', function() {
+      $authModal.removeClass('is-open').fadeOut(150);
+    });
+
+    // Close on Escape key
+    $(document).on('keydown', function(e) {
+      if ((e.key === 'Escape' || e.keyCode === 27) && $authModal.is(':visible')) {
+        $authModal.removeClass('is-open').fadeOut(150);
+      }
+    });
+
+    // Password Visibility Toggle
+    $(document).on('click', '.bns-pwd-toggle', function(e) {
       e.preventDefault();
       var $btn = $(this);
-      var isPage = $btn.attr('id') === 'bns-inpage-btn-google-auth';
-      var $alert = isPage ? $('#bns-inpage-auth-alert') : $('#bns-auth-alert');
-      
-      $alert.hide();
+      var $wrap = $btn.closest('.bns-password-wrap');
+      var $input = $wrap.find('input');
+      var isPassword = $input.attr('type') === 'password';
+
+      $input.attr('type', isPassword ? 'text' : 'password');
+      if (isPassword) {
+        $btn.find('.bns-eye-show').hide();
+        $btn.find('.bns-eye-hide').show();
+      } else {
+        $btn.find('.bns-eye-show').show();
+        $btn.find('.bns-eye-hide').hide();
+      }
+    });
+
+    // Sign In Submission Handler (Modal & In-Page)
+    $(document).on('submit', '#bns-form-signin, #bns-inpage-form-signin', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      var isPage = $form.attr('id') === 'bns-inpage-form-signin';
+      var $btn = $form.find('button[type="submit"]');
+      var $btnText = $btn.find('.bns-btn-text');
+      var origText = $btnText.text();
+
+      var emailVal = $.trim($form.find('input[name="email"]').val());
+      var passVal = $.trim($form.find('input[name="password"]').val());
+
+      if (!emailVal) {
+        showAuthAlert('Please enter your email address.', 'error', isPage);
+        return;
+      }
+      if (!passVal) {
+        showAuthAlert('Please enter your password.', 'error', isPage);
+        return;
+      }
+
+      hideAuthAlert(isPage);
       $btn.prop('disabled', true).addClass('is-loading');
-      var $text = $btn.find('.bns-google-text');
-      var originalText = $text.text();
-      $text.text('Connecting with Google...');
+      $btnText.text('Signing in...');
+
+      var formData = $form.serializeArray();
+      var dataObj = {};
+      $.each(formData, function(_, field) {
+        dataObj[field.name] = field.value;
+      });
+      dataObj.action = 'bns_email_login';
+      if (!dataObj.security && defaultNonce) {
+        dataObj.security = defaultNonce;
+      }
+      dataObj.redirect = window.location.href;
 
       $.ajax({
-        url: '/wp-admin/admin-ajax.php',
+        url: ajaxEndpoint,
         type: 'POST',
-        data: {
-          action: 'bns_google_login',
-          id_token: 'mock_token',
-          redirect: window.location.href
-        },
+        data: dataObj,
         success: function(res) {
           if (res && res.success) {
-            $text.text('Signed In!');
-            showToast('Google Authentication', res.data.message || 'Welcome to BookMySmoke!', 'success');
+            $btnText.text('Signed In!');
+            showAuthAlert(res.data.message || 'Signed in successfully!', 'success', isPage);
+            if (typeof showToast === 'function') {
+              showToast('Authentication', res.data.message || 'Welcome back to BookMySmoke!', 'success');
+            }
             setTimeout(function() {
-              if (res.data.redirect) {
+              if (res.data && res.data.redirect) {
                 window.location.href = res.data.redirect;
               } else {
                 location.reload();
@@ -495,20 +249,152 @@
             }, 500);
           } else {
             $btn.prop('disabled', false).removeClass('is-loading');
-            $text.text(originalText);
-            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Google authentication failed. Please try again.';
+            $btnText.text(origText);
+            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Invalid email address or password.';
             showAuthAlert(errMsg, 'error', isPage);
           }
         },
         error: function() {
           $btn.prop('disabled', false).removeClass('is-loading');
-          $text.text(originalText);
-          showAuthAlert('Network error during Google sign-in. Please try again.', 'error', isPage);
+          $btnText.text(origText);
+          showAuthAlert('Network error during sign-in. Please try again.', 'error', isPage);
         }
       });
     });
 
+    // Sign Up / Registration Submission Handler (Modal & In-Page)
+    $(document).on('submit', '#bns-form-signup, #bns-inpage-form-signup', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      var isPage = $form.attr('id') === 'bns-inpage-form-signup';
+      var $btn = $form.find('button[type="submit"]');
+      var $btnText = $btn.find('.bns-btn-text');
+      var origText = $btnText.text();
 
+      var nameVal = $.trim($form.find('input[name="name"]').val());
+      var emailVal = $.trim($form.find('input[name="email"]').val());
+      var pwd = $form.find('input[name="password"]').val();
+      var confirmPwd = $form.find('input[name="confirm_password"]').val();
+
+      if (!nameVal) {
+        showAuthAlert('Please enter your full name.', 'error', isPage);
+        return;
+      }
+
+      if (!emailVal || emailVal.indexOf('@') === -1) {
+        showAuthAlert('Please enter a valid email address.', 'error', isPage);
+        return;
+      }
+
+      if (!pwd || pwd.length < 8) {
+        showAuthAlert('Password must be at least 8 characters long.', 'error', isPage);
+        return;
+      }
+
+      if (pwd !== confirmPwd) {
+        showAuthAlert('Passwords do not match. Please re-enter your confirm password.', 'error', isPage);
+        return;
+      }
+
+      hideAuthAlert(isPage);
+      $btn.prop('disabled', true).addClass('is-loading');
+      $btnText.text('Creating Account...');
+
+      var formData = $form.serializeArray();
+      var dataObj = {};
+      $.each(formData, function(_, field) {
+        dataObj[field.name] = field.value;
+      });
+      dataObj.action = 'bns_email_register';
+      if (!dataObj.security && defaultNonce) {
+        dataObj.security = defaultNonce;
+      }
+      dataObj.redirect = window.location.href;
+
+      $.ajax({
+        url: ajaxEndpoint,
+        type: 'POST',
+        data: dataObj,
+        success: function(res) {
+          if (res && res.success) {
+            $btnText.text('Account Created!');
+            showAuthAlert(res.data.message || 'Account created successfully!', 'success', isPage);
+            if (typeof showToast === 'function') {
+              showToast('Account Created', res.data.message || 'Welcome to BookMySmoke!', 'success');
+            }
+            setTimeout(function() {
+              if (res.data && res.data.redirect) {
+                window.location.href = res.data.redirect;
+              } else {
+                location.reload();
+              }
+            }, 500);
+          } else {
+            $btn.prop('disabled', false).removeClass('is-loading');
+            $btnText.text(origText);
+            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not create account. Please try again.';
+            showAuthAlert(errMsg, 'error', isPage);
+          }
+        },
+        error: function() {
+          $btn.prop('disabled', false).removeClass('is-loading');
+          $btnText.text(origText);
+          showAuthAlert('Network error during registration. Please try again.', 'error', isPage);
+        }
+      });
+    });
+
+    // Forgot Password Submission Handler (Modal & In-Page)
+    $(document).on('submit', '#bns-form-forgot, #bns-inpage-form-forgot', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      var isPage = $form.attr('id') === 'bns-inpage-form-forgot';
+      var $btn = $form.find('button[type="submit"]');
+      var $btnText = $btn.find('.bns-btn-text');
+      var origText = $btnText.text();
+
+      var emailVal = $.trim($form.find('input[name="email"]').val());
+      if (!emailVal || emailVal.indexOf('@') === -1) {
+        showAuthAlert('Please enter a valid email address.', 'error', isPage);
+        return;
+      }
+
+      hideAuthAlert(isPage);
+      $btn.prop('disabled', true).addClass('is-loading');
+      $btnText.text('Sending Link...');
+
+      var formData = $form.serializeArray();
+      var dataObj = {};
+      $.each(formData, function(_, field) {
+        dataObj[field.name] = field.value;
+      });
+      dataObj.action = 'bns_forgot_password';
+      if (!dataObj.security && defaultNonce) {
+        dataObj.security = defaultNonce;
+      }
+
+      $.ajax({
+        url: ajaxEndpoint,
+        type: 'POST',
+        data: dataObj,
+        success: function(res) {
+          $btn.prop('disabled', false).removeClass('is-loading');
+          $btnText.text(origText);
+          if (res && res.success) {
+            showAuthAlert(res.data.message || 'If that email is registered, a password reset link has been sent.', 'success', isPage);
+            $form.find('input[name="email"]').val('');
+          } else {
+            var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Failed to send password reset email. Please try again.';
+            showAuthAlert(errMsg, 'error', isPage);
+          }
+        },
+        error: function() {
+          $btn.prop('disabled', false).removeClass('is-loading');
+          $btnText.text(origText);
+          showAuthAlert('Network error while processing request. Please try again.', 'error', isPage);
+        }
+      });
+    });
 
     // ------------------------------------------------------------------------
     // 10. Customer-Facing Gallery: Interactive Filter Tabs & Full-Screen Lightbox
@@ -761,7 +647,7 @@
 
         // Update summary box
         $('#bns-sum-rental-title').text(pkg.title);
-        $('#bns-sum-rental-price').text('â‚¹' + parseFloat(pkg.price).toFixed(2));
+        $('#bns-sum-rental-price').text('Ã¢â€šÂ¹' + parseFloat(pkg.price).toFixed(2));
 
         // Update images
         var imgUrl = '/wp-content/themes/booknowshisha-theme/assets/images/rentals/' + pkg.image;
@@ -795,10 +681,10 @@
         var unitTotal = rentalPrice + basePrice + chillumPrice;
         var grandTotal = unitTotal * currentQty;
 
-        $('#bns-sum-rental-price').text('â‚¹' + rentalPrice.toFixed(2));
-        $('#bns-sum-base-price').text(basePrice > 0 ? '+â‚¹' + basePrice.toFixed(2) : 'â‚¹0.00');
-        $('#bns-sum-chillum-price').text(chillumPrice > 0 ? '+â‚¹' + chillumPrice.toFixed(2) : 'Included (â‚¹0.00)');
-        $('#bns-sum-total-price').text('â‚¹' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        $('#bns-sum-rental-price').text('Ã¢â€šÂ¹' + rentalPrice.toFixed(2));
+        $('#bns-sum-base-price').text(basePrice > 0 ? '+Ã¢â€šÂ¹' + basePrice.toFixed(2) : 'Ã¢â€šÂ¹0.00');
+        $('#bns-sum-chillum-price').text(chillumPrice > 0 ? '+Ã¢â€šÂ¹' + chillumPrice.toFixed(2) : 'Included (Ã¢â€šÂ¹0.00)');
+        $('#bns-sum-total-price').text('Ã¢â€šÂ¹' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
       }
 
       // Visual View Switcher (Rental Setup vs Prepared Bowl)
@@ -827,10 +713,10 @@
         selectedChillumPrice = parseFloat($card.data('price') || 0);
 
         $('#bns-sum-chillum-title').text(selectedChillum);
-        $('#bns-sum-chillum-price').text(selectedChillumPrice > 0 ? '+â‚¹' + selectedChillumPrice.toFixed(2) : 'Included (â‚¹0.00)');
+        $('#bns-sum-chillum-price').text(selectedChillumPrice > 0 ? '+Ã¢â€šÂ¹' + selectedChillumPrice.toFixed(2) : 'Included (Ã¢â€šÂ¹0.00)');
         
         recalcConfiguratorTotal();
-        showToast('Chilam Selected', selectedChillum + (selectedChillumPrice > 0 ? ' (+â‚¹100)' : '') + ' configured for your setup.', 'info');
+        showToast('Chilam Selected', selectedChillum + (selectedChillumPrice > 0 ? ' (+Ã¢â€šÂ¹100)' : '') + ' configured for your setup.', 'info');
       });
 
       // Chip Click (Flavour Selection)
@@ -893,7 +779,7 @@
         selectedBaseLabel = $activeCard.data('label') || 'Standard Base';
 
         $('#bns-sum-base-title').text(selectedBaseLabel);
-        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+â‚¹' + selectedBasePrice.toFixed(2) : 'â‚¹0.00');
+        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+Ã¢â€šÂ¹' + selectedBasePrice.toFixed(2) : 'Ã¢â€šÂ¹0.00');
         recalcConfiguratorTotal();
       });
 
@@ -908,7 +794,7 @@
         selectedBaseLabel = 'No Base (Chilam Only)';
 
         $('#bns-sum-base-title').text('No Base (Chilam Only)');
-        $('#bns-sum-base-price').text('â‚¹0.00');
+        $('#bns-sum-base-price').text('Ã¢â€šÂ¹0.00');
         recalcConfiguratorTotal();
       });
 
@@ -926,7 +812,7 @@
         selectedBaseLabel = $card.data('label') || 'Standard Base';
 
         $('#bns-sum-base-title').text(selectedBaseLabel);
-        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+â‚¹' + selectedBasePrice.toFixed(2) : 'â‚¹0.00');
+        $('#bns-sum-base-price').text(selectedBasePrice > 0 ? '+Ã¢â€šÂ¹' + selectedBasePrice.toFixed(2) : 'Ã¢â€šÂ¹0.00');
         recalcConfiguratorTotal();
       });
 
@@ -1126,5 +1012,7 @@
 
   });
 })(jQuery);
+
+
 
 

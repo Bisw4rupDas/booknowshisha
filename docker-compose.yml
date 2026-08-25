@@ -1,4 +1,4 @@
-services:
+﻿services:
   # ============================================================================
   # 1. PostgreSQL Database Service
   # ============================================================================
@@ -64,8 +64,6 @@ services:
       WORDPRESS_URL: ${WORDPRESS_URL:-http://wordpress:80}
       WOOCOMMERCE_CONSUMER_KEY: ${WOOCOMMERCE_CONSUMER_KEY:-}
       WOOCOMMERCE_CONSUMER_SECRET: ${WOOCOMMERCE_CONSUMER_SECRET:-}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       UPI_GATEWAY_KEY_ID: ${UPI_GATEWAY_KEY_ID:-}
       UPI_GATEWAY_KEY_SECRET: ${UPI_GATEWAY_KEY_SECRET:-}
       UPI_WEBHOOK_SECRET: ${UPI_WEBHOOK_SECRET:-}
@@ -151,3 +149,4 @@ volumes:
 networks:
   booknowshisha-network:
     driver: bridge
+

@@ -1,4 +1,4 @@
-# BookNowShisha - Database Schema & Data Modeling
+﻿# BookNowShisha - Database Schema & Data Modeling
 
 ## 1. Overview
 The database layer is built on **PostgreSQL 16** and managed using **Prisma ORM**.
@@ -62,7 +62,7 @@ erDiagram
 ## 3. Detailed Model Reference
 
 ### 3.1 Identity & Access
-- **`User`**: Core authentication record holding email, password hash, role (`CUSTOMER`, `STAFF`, `ADMIN`, `SUPER_ADMIN`), 2FA secrets, and Google OAuth IDs.
+- **`User`**: Core authentication record holding email, password hash, role (`CUSTOMER`, `STAFF`, `ADMIN`, `SUPER_ADMIN`), and security timestamps.
 - **`Customer`**: Customer address information, phone numbers, and optional `wpCustomerId` link.
 - **`Staff`**: Delivery and field inspection personnel details.
 - **`Admin`**: Administrative dashboard personnel.
@@ -95,3 +95,4 @@ erDiagram
 - **`DamageReport`**: Itemized damage descriptions, costs, and photographic evidence.
 - **`Coupon`**: Promotional discount codes and usage constraints.
 - **`AuditLog`**: Immutable event tracking for security and accountability.
+

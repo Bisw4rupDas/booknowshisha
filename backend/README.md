@@ -1,4 +1,4 @@
-# BookNowShisha - Backend API
+﻿# BookNowShisha - Backend API
 
 Core business logic, authentication, rental engine, inventory tracking, and commerce integration API built with NestJS, TypeScript, Prisma, PostgreSQL, and Redis.
 
@@ -6,31 +6,31 @@ Core business logic, authentication, rental engine, inventory tracking, and comm
 
 ```
 backend/
-├── src/
-│   ├── auth/          # Authentication & Google OAuth
-│   ├── users/         # User identities & role management
-│   ├── customers/     # Customer profiles & WooCommerce linkage
-│   ├── hookahs/       # Hookah models & catalog specs
-│   ├── rentals/       # Rental orders, status workflow & lifecycle
-│   ├── bookings/      # Booking reservation system & locking
-│   ├── flavours/      # Flavour categories & consumable tracking
-│   ├── inventory/     # Individual serialised hookah units
-│   ├── packages/      # Rental bundles & tiered pricing
-│   ├── delivery/      # Delivery zones, slots & dispatch
-│   ├── orders/        # E-commerce orders & WooCommerce sync
-│   ├── payments/      # UPI & payment gateway integration
-│   ├── returns/       # Returns inspection & intake
-│   ├── damage/        # Damage assessment & deposit deductions
-│   ├── notifications/ # Transactional emails & SMS
-│   ├── admin/         # Admin management, COD & reconciliation
-│   ├── common/        # Filters, interceptors, guards, decorators
-│   ├── health/        # Liveness & readiness diagnostic checks
-│   ├── prisma/        # Prisma service & database module
-│   ├── app.module.ts  # Root application module
-│   └── main.ts        # Bootstrap entrypoint & Swagger setup
-├── prisma/
-│   └── schema.prisma  # PostgreSQL relational models
-└── test/              # Unit and E2E test suites
+â”œâ”€â”€ src/
+│   ├── auth/          # Email Authentication & Customer Security
+â”‚   â”œâ”€â”€ users/         # User identities & role management
+â”‚   â”œâ”€â”€ customers/     # Customer profiles & WooCommerce linkage
+â”‚   â”œâ”€â”€ hookahs/       # Hookah models & catalog specs
+â”‚   â”œâ”€â”€ rentals/       # Rental orders, status workflow & lifecycle
+â”‚   â”œâ”€â”€ bookings/      # Booking reservation system & locking
+â”‚   â”œâ”€â”€ flavours/      # Flavour categories & consumable tracking
+â”‚   â”œâ”€â”€ inventory/     # Individual serialised hookah units
+â”‚   â”œâ”€â”€ packages/      # Rental bundles & tiered pricing
+â”‚   â”œâ”€â”€ delivery/      # Delivery zones, slots & dispatch
+â”‚   â”œâ”€â”€ orders/        # E-commerce orders & WooCommerce sync
+â”‚   â”œâ”€â”€ payments/      # UPI & payment gateway integration
+â”‚   â”œâ”€â”€ returns/       # Returns inspection & intake
+â”‚   â”œâ”€â”€ damage/        # Damage assessment & deposit deductions
+â”‚   â”œâ”€â”€ notifications/ # Transactional emails & SMS
+â”‚   â”œâ”€â”€ admin/         # Admin management, COD & reconciliation
+â”‚   â”œâ”€â”€ common/        # Filters, interceptors, guards, decorators
+â”‚   â”œâ”€â”€ health/        # Liveness & readiness diagnostic checks
+â”‚   â”œâ”€â”€ prisma/        # Prisma service & database module
+â”‚   â”œâ”€â”€ app.module.ts  # Root application module
+â”‚   â””â”€â”€ main.ts        # Bootstrap entrypoint & Swagger setup
+â”œâ”€â”€ prisma/
+â”‚   â””â”€â”€ schema.prisma  # PostgreSQL relational models
+â””â”€â”€ test/              # Unit and E2E test suites
 ```
 
 ## Quick Start
@@ -52,3 +52,5 @@ npm run start:dev
 
 ### 4. Interactive API Documentation
 Once running, open: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+
+

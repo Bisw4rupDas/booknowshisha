@@ -1,4 +1,4 @@
-# BookNowShisha - API Architecture & Endpoints
+﻿# BookNowShisha - API Architecture & Endpoints
 
 ## 1. Overview
 The BookNowShisha API is a RESTful service built with **NestJS**, adhering to OpenAPI 3.0 specifications.
@@ -21,7 +21,6 @@ The BookNowShisha API is a RESTful service built with **NestJS**, adhering to Op
 |---|---|---|---|
 | `POST` | `/api/auth/register` | Register customer account | Public |
 | `POST` | `/api/auth/login` | Email/password login | Public |
-| `POST` | `/api/auth/google` | Social OAuth exchange | Public |
 | `POST` | `/api/auth/refresh` | Refresh JWT access token | Refresh Token |
 | `POST` | `/api/auth/logout` | Revoke session | Authenticated |
 
@@ -101,3 +100,4 @@ Error responses:
   }
 }
 ```
+
