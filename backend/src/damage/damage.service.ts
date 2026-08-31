@@ -38,7 +38,12 @@ export class DamageService {
           inspectionId: dto.inspectionId,
           description: dto.description,
           damageCost: dto.damageCost,
-          photos: dto.photos || [],
+          photos: {
+            create: (dto.photos || []).map((url) => ({ url })),
+          },
+        },
+        include: {
+          photos: true,
         },
       });
 
@@ -116,6 +121,7 @@ export class DamageService {
     const reports = await this.prisma.damageReport.findMany({
       where: { rentalId },
       include: {
+        photos: true,
         inspection: {
           include: { staff: true },
         },
@@ -139,6 +145,7 @@ export class DamageService {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
+          photos: true,
           rental: {
             select: {
               id: true,
@@ -175,6 +182,7 @@ export class DamageService {
     const report = await this.prisma.damageReport.findUnique({
       where: { id },
       include: {
+        photos: true,
         rental: {
           include: {
             customer: true,

@@ -1,0 +1,32 @@
+-- PostgreSQL Initial Migration Archive
+-- Preserved for historical reference and backup
+
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('CUSTOMER', 'STAFF', 'ADMIN', 'SUPER_ADMIN');
+
+-- CreateEnum
+CREATE TYPE "BookingStatus" AS ENUM ('DRAFT', 'PENDING', 'CONFIRMED', 'CANCELLED', 'EXPIRED');
+
+-- CreateEnum
+CREATE TYPE "RentalStatus" AS ENUM ('RESERVED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED', 'ACTIVE', 'RETURN_PENDING', 'RETURNED', 'INSPECTED', 'COMPLETED', 'DISPUTED', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'CONFIRMED', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'REFUNDED');
+
+-- CreateEnum
+CREATE TYPE "PaymentMethod" AS ENUM ('COD', 'UPI');
+
+-- CreateEnum
+CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'PROCESSING', 'SUCCESS', 'FAILED', 'REFUNDED', 'PARTIALLY_REFUNDED');
+
+-- CreateEnum
+CREATE TYPE "DeliveryStatus" AS ENUM ('PENDING', 'ASSIGNED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED', 'RESCHEDULED');
+
+-- CreateEnum
+CREATE TYPE "InspectionStatus" AS ENUM ('PENDING', 'PASSED', 'DAMAGED', 'MISSING_ITEMS');
+
+-- CreateEnum
+CREATE TYPE "HookahCondition" AS ENUM ('EXCELLENT', 'GOOD', 'FAIR', 'MAINTENANCE', 'RETIRED');
+
+-- CreateEnum
+CREATE TYPE "HookahInventoryStatus" AS ENUM ('AVAILABLE', 'RESERVED', 'RENTED', 'IN_MAINTENANCE', 'DECOMMISSIONED');

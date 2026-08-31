@@ -260,12 +260,12 @@ export class OrdersService {
 
     if (search) {
       where.OR = [
-        { orderNumber: { contains: search, mode: 'insensitive' } },
+        { orderNumber: { contains: search } },
         {
           customer: {
             OR: [
-              { firstName: { contains: search, mode: 'insensitive' } },
-              { lastName: { contains: search, mode: 'insensitive' } },
+              { firstName: { contains: search } },
+              { lastName: { contains: search } },
               { phone: { contains: search } },
             ],
           },

@@ -207,7 +207,7 @@ export class BookingsService {
       endTime: string;
       maxCapacity: number;
       isActive: boolean;
-      zone: { id: string; name: string; postalCodes: string[]; baseFee: any; isActive: boolean };
+      zone?: { id: string; name: string; baseFee: any; isActive: boolean } | null;
     } | null = null;
 
     if (dto.deliverySlotId && !dto.deliverySlotId.includes(':')) {
@@ -223,8 +223,8 @@ export class BookingsService {
         where: {
           isActive: true,
           OR: [
-            { postalCodes: { has: dto.postalCode } },
-            { name: { contains: serviceability.district || 'Kolkata', mode: 'insensitive' } },
+            { postalCodes: { some: { postalCode: dto.postalCode } } },
+            { name: { contains: serviceability.district || 'Kolkata' } },
           ],
         },
         include: { slots: { where: { isActive: true } } },

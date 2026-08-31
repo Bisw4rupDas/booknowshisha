@@ -83,10 +83,10 @@ export class CustomersService {
     const where: any = {};
     if (search) {
       where.OR = [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
+        { firstName: { contains: search } },
+        { lastName: { contains: search } },
         { phone: { contains: search } },
-        { user: { email: { contains: search, mode: 'insensitive' } } },
+        { user: { email: { contains: search } } },
       ];
     }
 

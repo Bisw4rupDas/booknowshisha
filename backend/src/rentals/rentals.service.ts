@@ -177,12 +177,12 @@ export class RentalsService {
 
     if (search) {
       where.OR = [
-        { rentalNumber: { contains: search, mode: 'insensitive' } },
+        { rentalNumber: { contains: search } },
         {
           customer: {
             OR: [
-              { firstName: { contains: search, mode: 'insensitive' } },
-              { lastName: { contains: search, mode: 'insensitive' } },
+              { firstName: { contains: search } },
+              { lastName: { contains: search } },
               { phone: { contains: search } },
             ],
           },

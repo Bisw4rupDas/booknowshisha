@@ -1,6 +1,5 @@
 // ==============================================================================
-// BookNowShisha - Prisma Schema
-// PostgreSQL Relational Database Models
+// BookNowShisha - Prisma Schema (MySQL / MariaDB Compatible for cPanel)
 // ==============================================================================
 
 generator client {
@@ -8,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -106,26 +105,26 @@ enum HookahInventoryStatus {
 // ------------------------------------------------------------------------------
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String?
-  role         UserRole  @default(CUSTOMER)
-  isActive     Boolean   @default(true)
-  isVerified   Boolean   @default(false)
-  googleId     String?   @unique
-  twoFactorSecret String?
-  twoFactorEnabled Boolean @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id               String    @id @default(uuid())
+  email            String    @unique
+  passwordHash     String?
+  role             UserRole  @default(CUSTOMER)
+  isActive         Boolean   @default(true)
+  isVerified       Boolean   @default(false)
+  googleId         String?   @unique
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   // Profile Relations
-  customer     Customer?
-  staff        Staff?
-  admin        Admin?
+  customer         Customer?
+  staff            Staff?
+  admin            Admin?
 
   // System Logs & Notifications
-  notifications Notification[]
-  auditLogs     AuditLog[]
+  notifications    Notification[]
+  auditLogs        AuditLog[]
 
   @@map("users")
 }
@@ -142,7 +141,7 @@ model Customer {
   addressLine2    String?
   city            String?
   postalCode      String?
-  avatarUrl       String?
+  avatarUrl       String?   @db.VarChar(1000)
   wpCustomerId    Int?      @unique // WooCommerce Customer ID mapping
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -191,18 +190,18 @@ model HookahModel {
   id          String            @id @default(uuid())
   name        String
   slug        String            @unique
-  description String?
+  description String?           @db.Text
   heightCm    Float?
   material    String?
   basePrice   Decimal           @db.Decimal(10, 2)
   depositFee  Decimal           @default(0.00) @db.Decimal(10, 2)
-  imageUrl    String?
+  imageUrl    String?           @db.VarChar(1000)
   isActive    Boolean           @default(true)
   wpProductId Int?              @unique // WooCommerce Product ID mapping
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
-  inventory   HookahInventory[]
+  inventory    HookahInventory[]
   packageItems PackageItem[]
 
   @@map("hookah_models")
@@ -216,7 +215,7 @@ model HookahInventory {
   barcode       String?               @unique
   condition     HookahCondition       @default(EXCELLENT)
   status        HookahInventoryStatus @default(AVAILABLE)
-  notes         String?
+  notes         String?               @db.Text
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @updatedAt
 
@@ -233,7 +232,7 @@ model FlavourCategory {
   id          String    @id @default(uuid())
   name        String    @unique
   slug        String    @unique
-  description String?
+  description String?   @db.Text
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -249,9 +248,9 @@ model Flavour {
   name        String
   slug        String          @unique
   brand       String?
-  description String?
+  description String?         @db.Text
   isNicotine  Boolean         @default(true)
-  imageUrl    String?
+  imageUrl    String?         @db.VarChar(1000)
   isActive    Boolean         @default(true)
   wpProductId Int?            @unique
   createdAt   DateTime        @default(now())
@@ -280,20 +279,20 @@ model FlavourStock {
 // ------------------------------------------------------------------------------
 
 model Package {
-  id          String        @id @default(uuid())
-  name        String
-  slug        String        @unique
-  description String?
-  price       Decimal       @db.Decimal(10, 2)
-  durationHrs Int           @default(24) // Rental duration in hours (e.g. 24, 48, 72)
-  maxFlavours Int           @default(2)
-  includesCoals Boolean     @default(true)
-  includesMouthpieces Int   @default(4)
-  imageUrl    String?
-  isActive    Boolean       @default(true)
-  wpProductId Int?          @unique
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id                  String        @id @default(uuid())
+  name                String
+  slug                String        @unique
+  description         String?       @db.Text
+  price               Decimal       @db.Decimal(10, 2)
+  durationHrs         Int           @default(24) // Rental duration in hours (e.g. 24, 48, 72)
+  maxFlavours         Int           @default(2)
+  includesCoals       Boolean       @default(true)
+  includesMouthpieces Int           @default(4)
+  imageUrl            String?       @db.VarChar(1000)
+  isActive            Boolean       @default(true)
+  wpProductId         Int?          @unique
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 
   items       PackageItem[]
   bookings    Booking[]
@@ -318,52 +317,52 @@ model PackageItem {
 // ------------------------------------------------------------------------------
 
 model Booking {
-  id            String        @id @default(uuid())
-  bookingNumber String        @unique
-  customerId    String
-  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  packageId     String
-  package       Package       @relation(fields: [packageId], references: [id], onDelete: Restrict)
-  status        BookingStatus @default(PENDING)
-  rentalStart   DateTime
-  rentalEnd     DateTime
-  durationHours Int
-  totalAmount   Decimal       @db.Decimal(10, 2)
-  depositAmount Decimal       @default(0.00) @db.Decimal(10, 2)
-  deliverySlotId String?
-  deliverySlot  DeliverySlot? @relation(fields: [deliverySlotId], references: [id], onDelete: SetNull)
-  deliveryAddress String
-  postalCode    String
-  notes         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              String        @id @default(uuid())
+  bookingNumber   String        @unique
+  customerId      String
+  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  packageId       String
+  package         Package       @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  status          BookingStatus @default(PENDING)
+  rentalStart     DateTime
+  rentalEnd       DateTime
+  durationHours   Int
+  totalAmount     Decimal       @db.Decimal(10, 2)
+  depositAmount   Decimal       @default(0.00) @db.Decimal(10, 2)
+  deliverySlotId  String?
+  deliverySlot    DeliverySlot? @relation(fields: [deliverySlotId], references: [id], onDelete: SetNull)
+  deliveryAddress String        @db.Text
+  postalCode      String
+  notes           String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  rental        Rental?
-  order         Order?
+  rental          Rental?
+  order           Order?
 
   @@map("bookings")
 }
 
 model Rental {
-  id            String        @id @default(uuid())
-  rentalNumber  String        @unique
-  bookingId     String        @unique
-  booking       Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
-  customerId    String
-  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  packageId     String
-  package       Package       @relation(fields: [packageId], references: [id], onDelete: Restrict)
-  status        RentalStatus  @default(RESERVED)
-  startDate     DateTime
-  endDate       DateTime
-  actualReturn  DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              String           @id @default(uuid())
+  rentalNumber    String           @unique
+  bookingId       String           @unique
+  booking         Booking          @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  customerId      String
+  customer        Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  packageId       String
+  package         Package          @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  status          RentalStatus     @default(RESERVED)
+  startDate       DateTime
+  endDate         DateTime
+  actualReturn    DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
-  items         RentalItem[]
-  deliveries    Delivery[]
-  inspection    ReturnInspection?
-  damageReports DamageReport[]
+  items           RentalItem[]
+  deliveries      Delivery[]
+  inspection      ReturnInspection?
+  damageReports   DamageReport[]
   securityDeposit SecurityDeposit?
 
   @@map("rentals")
@@ -377,7 +376,7 @@ model RentalItem {
   hookahInventory   HookahInventory? @relation(fields: [hookahInventoryId], references: [id], onDelete: SetNull)
   flavourId         String?
   flavour           Flavour?         @relation(fields: [flavourId], references: [id], onDelete: SetNull)
-  notes             String?
+  notes             String?          @db.Text
 
   @@map("rental_items")
 }
@@ -400,7 +399,7 @@ model Order {
   deliveryFee Decimal     @default(0.00) @db.Decimal(10, 2)
   deposit     Decimal     @default(0.00) @db.Decimal(10, 2)
   totalAmount Decimal     @db.Decimal(10, 2)
-  notes       String?
+  notes       String?     @db.Text
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -429,17 +428,30 @@ model OrderItem {
 // ------------------------------------------------------------------------------
 
 model DeliveryZone {
-  id          String         @id @default(uuid())
+  id          String               @id @default(uuid())
   name        String
-  postalCodes String[]       // Supported PIN / Postal Codes
-  baseFee     Decimal        @default(0.00) @db.Decimal(10, 2)
-  isActive    Boolean        @default(true)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  baseFee     Decimal              @default(0.00) @db.Decimal(10, 2)
+  isActive    Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
+  postalCodes DeliveryPostalCode[]
   slots       DeliverySlot[]
 
   @@map("delivery_zones")
+}
+
+model DeliveryPostalCode {
+  id         String       @id @default(uuid())
+  zoneId     String
+  zone       DeliveryZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  postalCode String
+
+  createdAt  DateTime     @default(now())
+
+  @@unique([zoneId, postalCode])
+  @@index([postalCode])
+  @@map("delivery_postal_codes")
 }
 
 model DeliverySlot {
@@ -460,23 +472,23 @@ model DeliverySlot {
 }
 
 model Delivery {
-  id             String         @id @default(uuid())
-  deliveryNumber String         @unique
-  orderId        String?
-  order          Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  rentalId       String?
-  rental         Rental?        @relation(fields: [rentalId], references: [id], onDelete: SetNull)
-  staffId        String?
-  staff          Staff?         @relation(fields: [staffId], references: [id], onDelete: SetNull)
-  slotId         String?
-  slot           DeliverySlot?  @relation(fields: [slotId], references: [id], onDelete: SetNull)
-  status         DeliveryStatus @default(PENDING)
-  scheduledDate  DateTime
-  deliveryAddress String
-  deliveredAt    DateTime?
-  notes          String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id              String         @id @default(uuid())
+  deliveryNumber  String         @unique
+  orderId         String?
+  order           Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  rentalId        String?
+  rental          Rental?        @relation(fields: [rentalId], references: [id], onDelete: SetNull)
+  staffId         String?
+  staff           Staff?         @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  slotId          String?
+  slot            DeliverySlot?  @relation(fields: [slotId], references: [id], onDelete: SetNull)
+  status          DeliveryStatus @default(PENDING)
+  scheduledDate   DateTime
+  deliveryAddress String         @db.Text
+  deliveredAt     DateTime?
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@map("deliveries")
 }
@@ -515,22 +527,22 @@ model CashCollection {
   collectedAt  DateTime  @default(now())
   reconciled   Boolean   @default(false)
   reconciledAt DateTime?
-  notes        String?
+  notes        String?   @db.Text
 
   @@map("cash_collections")
 }
 
 model SecurityDeposit {
-  id             String    @id @default(uuid())
-  rentalId       String    @unique
-  rental         Rental    @relation(fields: [rentalId], references: [id], onDelete: Restrict)
-  amount         Decimal   @db.Decimal(10, 2)
-  heldAt         DateTime  @default(now())
-  isRefunded     Boolean   @default(false)
-  refundAmount   Decimal?  @db.Decimal(10, 2)
-  deductionAmount Decimal? @db.Decimal(10, 2)
-  refundedAt     DateTime?
-  notes          String?
+  id              String    @id @default(uuid())
+  rentalId        String    @unique
+  rental          Rental    @relation(fields: [rentalId], references: [id], onDelete: Restrict)
+  amount          Decimal   @db.Decimal(10, 2)
+  heldAt          DateTime  @default(now())
+  isRefunded      Boolean   @default(false)
+  refundAmount    Decimal?  @db.Decimal(10, 2)
+  deductionAmount Decimal?  @db.Decimal(10, 2)
+  refundedAt      DateTime?
+  notes           String?   @db.Text
 
   @@map("security_deposits")
 }
@@ -540,18 +552,18 @@ model SecurityDeposit {
 // ------------------------------------------------------------------------------
 
 model ReturnInspection {
-  id           String           @id @default(uuid())
-  rentalId     String           @unique
-  rental       Rental           @relation(fields: [rentalId], references: [id], onDelete: Restrict)
-  inspectedBy  String
-  staff        Staff            @relation(fields: [inspectedBy], references: [id], onDelete: Restrict)
-  status       InspectionStatus @default(PENDING)
-  isClean      Boolean          @default(true)
-  allPartsPresent Boolean       @default(true)
-  notes        String?
-  inspectedAt  DateTime         @default(now())
+  id              String           @id @default(uuid())
+  rentalId        String           @unique
+  rental          Rental           @relation(fields: [rentalId], references: [id], onDelete: Restrict)
+  inspectedBy     String
+  staff           Staff            @relation(fields: [inspectedBy], references: [id], onDelete: Restrict)
+  status          InspectionStatus @default(PENDING)
+  isClean         Boolean          @default(true)
+  allPartsPresent Boolean          @default(true)
+  notes           String?          @db.Text
+  inspectedAt     DateTime         @default(now())
 
-  damageReport DamageReport?
+  damageReport    DamageReport?
 
   @@map("return_inspections")
 }
@@ -562,17 +574,29 @@ model DamageReport {
   rental       Rental            @relation(fields: [rentalId], references: [id], onDelete: Restrict)
   inspectionId String?           @unique
   inspection   ReturnInspection? @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
-  description  String
+  description  String            @db.Text
   damageCost   Decimal           @db.Decimal(10, 2)
-  photos       String[]
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
+
+  photos       DamagePhoto[]
 
   @@map("damage_reports")
 }
 
+model DamagePhoto {
+  id             String       @id @default(uuid())
+  damageReportId String
+  damageReport   DamageReport @relation(fields: [damageReportId], references: [id], onDelete: Cascade)
+  url            String       @db.VarChar(1000)
+  createdAt      DateTime     @default(now())
+
+  @@index([damageReportId])
+  @@map("damage_photos")
+}
+
 // ------------------------------------------------------------------------------
-// 10. MARKETING, NOTIFICATIONS & AUDIT LOGS
+// 10. MARKETING, NOTIFICATIONS, AUDIT LOGS & AUTH STORE
 // ------------------------------------------------------------------------------
 
 model Coupon {
@@ -597,7 +621,7 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
-  message   String
+  message   String   @db.Text
   type      String   @default("INFO") // INFO, BOOKING, RENTAL, PAYMENT, SECURITY
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -618,4 +642,18 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@map("audit_logs")
+}
+
+model OtpVerification {
+  id         String   @id @default(uuid())
+  phone      String   @unique
+  otpHash    String
+  attempts   Int      @default(0)
+  expiresAt  DateTime
+  cooldownAt DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([phone])
+  @@map("otp_verifications")
 }

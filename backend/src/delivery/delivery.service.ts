@@ -37,6 +37,7 @@ export class DeliveryService {
     const zones = await this.prisma.deliveryZone.findMany({
       where: { isActive: true },
       include: {
+        postalCodes: true,
         slots: {
           where: { isActive: true },
           orderBy: { startTime: 'asc' },
@@ -44,7 +45,9 @@ export class DeliveryService {
       },
     });
 
-    const matchedZone = zones.find((z) => z.postalCodes.includes(dto.postalCode)) || zones[0];
+    const matchedZone =
+      zones.find((z) => (z.postalCodes || []).some((p) => p.postalCode === dto.postalCode)) ||
+      zones[0];
 
     const availableSlots = matchedZone?.slots?.map((s) => ({
       id: s.id,
@@ -75,9 +78,10 @@ export class DeliveryService {
   }
 
   async getZones() {
-    return this.prisma.deliveryZone.findMany({
+    const zones = await this.prisma.deliveryZone.findMany({
       where: { isActive: true },
       include: {
+        postalCodes: true,
         slots: {
           where: { isActive: true },
           orderBy: { startTime: 'asc' },
@@ -85,6 +89,11 @@ export class DeliveryService {
       },
       orderBy: { name: 'asc' },
     });
+
+    return zones.map((z) => ({
+      ...z,
+      postalCodes: z.postalCodes.map((p) => p.postalCode),
+    }));
   }
 
   async getSlots(postalCode?: string) {
@@ -97,9 +106,10 @@ export class DeliveryService {
       const zone = await this.prisma.deliveryZone.findFirst({
         where: {
           isActive: true,
-          postalCodes: { has: postalCode },
+          postalCodes: { some: { postalCode } },
         },
         include: {
+          postalCodes: true,
           slots: {
             where: { isActive: true },
             orderBy: { startTime: 'asc' },

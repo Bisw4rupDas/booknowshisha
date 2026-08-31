@@ -103,9 +103,9 @@ export class InventoryService {
     }
     if (search) {
       where.OR = [
-        { serialNumber: { contains: search, mode: 'insensitive' } },
-        { barcode: { contains: search, mode: 'insensitive' } },
-        { hookahModel: { name: { contains: search, mode: 'insensitive' } } },
+        { serialNumber: { contains: search } },
+        { barcode: { contains: search } },
+        { hookahModel: { name: { contains: search } } },
       ];
     }
 

@@ -1,4 +1,4 @@
-﻿services:
+services:
   # ============================================================================
   # 1. PostgreSQL Database Service
   # ============================================================================
@@ -106,6 +106,8 @@
       MYSQL_DATABASE: ${WORDPRESS_DB_NAME:-wordpress_db}
       MYSQL_USER: ${WORDPRESS_DB_USER:-wp_user}
       MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wp_password}
+    ports:
+      - "3306:3306"
     volumes:
       - wp_db_data:/var/lib/mysql
     networks:

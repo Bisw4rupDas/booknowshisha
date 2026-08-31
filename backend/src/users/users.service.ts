@@ -25,7 +25,7 @@ export class UsersService {
       where.role = role;
     }
     if (search) {
-      where.email = { contains: search, mode: 'insensitive' };
+      where.email = { contains: search };
     }
 
     const [total, items] = await Promise.all([

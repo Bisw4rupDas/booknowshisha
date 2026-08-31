@@ -43,7 +43,7 @@ describe('BookingsService', () => {
     zone: {
       id: 'zone-uuid-1',
       name: 'Central Kolkata',
-      postalCodes: ['700091', '700016'],
+      postalCodes: [{ postalCode: '700091' }, { postalCode: '700016' }],
       baseFee: 150.0,
       isActive: true,
     },

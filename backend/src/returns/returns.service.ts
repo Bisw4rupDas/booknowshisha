@@ -153,8 +153,11 @@ export class ReturnsService {
           inspectionId: rental.inspection?.id,
           description: dto.description,
           damageCost: dto.damageCost,
-          photos: dto.photos || [],
+          photos: {
+            create: (dto.photos || []).map((url) => ({ url })),
+          },
         },
+        include: { photos: true },
       });
 
       // 2. Adjust security deposit

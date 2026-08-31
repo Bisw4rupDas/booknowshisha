@@ -132,10 +132,23 @@ async function main() {
       : await prisma.deliveryZone.create({
           data: {
             name: zoneInfo.name,
-            postalCodes: zoneInfo.postalCodes,
             baseFee: zoneInfo.baseFee,
           },
         });
+
+    for (const pin of zoneInfo.postalCodes) {
+      const existingPin = await prisma.deliveryPostalCode.findFirst({
+        where: { zoneId: zone.id, postalCode: pin },
+      });
+      if (!existingPin) {
+        await prisma.deliveryPostalCode.create({
+          data: {
+            zoneId: zone.id,
+            postalCode: pin,
+          },
+        });
+      }
+    }
 
     for (const slot of zoneInfo.slots) {
       const existingSlot = await prisma.deliverySlot.findFirst({

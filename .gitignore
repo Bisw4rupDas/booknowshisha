@@ -57,6 +57,8 @@ wordpress/upgrade/
 wordpress/backup/
 wordpress/cache/
 *.sql
+!backend/prisma/migrations/**/*.sql
+!backend/prisma/migrations_postgres_archive/**/*.sql
 *.sql.gz
 wp-config.php
 wordpress/wp-config.php
@@ -65,3 +67,9 @@ wordpress/wp-config.php
 tmp/
 temp/
 *.tmp
+
+# Test Request JSON Scratch Files
+booking.json
+login.json
+zone.json
+payment.json

@@ -13,7 +13,12 @@ describe('DeliveryService', () => {
     {
       id: 'zone-1',
       name: 'Salt Lake & New Town Hub',
-      postalCodes: ['700064', '700091', '700156', '700160'],
+      postalCodes: [
+        { postalCode: '700064' },
+        { postalCode: '700091' },
+        { postalCode: '700156' },
+        { postalCode: '700160' },
+      ],
       baseFee: 150.0,
       isActive: true,
       slots: [
@@ -24,7 +29,12 @@ describe('DeliveryService', () => {
     {
       id: 'zone-2',
       name: 'Central & South Kolkata Hub',
-      postalCodes: ['700001', '700016', '700019', '700027'],
+      postalCodes: [
+        { postalCode: '700001' },
+        { postalCode: '700016' },
+        { postalCode: '700019' },
+        { postalCode: '700027' },
+      ],
       baseFee: 150.0,
       isActive: true,
       slots: [
@@ -39,9 +49,11 @@ describe('DeliveryService', () => {
       deliveryZone: {
         findMany: jest.fn().mockResolvedValue(mockZones),
         findFirst: jest.fn().mockImplementation((query: any) => {
-          if (query?.where?.postalCodes?.has) {
-            const pin = query.where.postalCodes.has;
-            return Promise.resolve(mockZones.find((z) => z.postalCodes.includes(pin)) || null);
+          if (query?.where?.postalCodes?.some?.postalCode) {
+            const pin = query.where.postalCodes.some.postalCode;
+            return Promise.resolve(
+              mockZones.find((z) => z.postalCodes.some((p) => p.postalCode === pin)) || null,
+            );
           }
           return Promise.resolve(mockZones[0]);
         }),

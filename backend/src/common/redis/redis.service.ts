@@ -5,42 +5,81 @@ import Redis from 'ioredis';
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
-  private client!: Redis;
+  private client: Redis | null = null;
 
   constructor(private readonly configService: ConfigService) {}
 
   onModuleInit() {
-    const redisUrl = this.configService.get<string>('REDIS_URL', 'redis://localhost:6379');
-    this.client = new Redis(redisUrl, {
-      maxRetriesPerRequest: 3,
-      retryStrategy: (times) => Math.min(times * 100, 3000),
-    });
+    const redisUrl = this.configService.get<string>('REDIS_URL');
 
-    this.client.on('connect', () => {
-      this.logger.log('Connected to Redis server');
-    });
+    if (!redisUrl || redisUrl === 'disabled' || redisUrl === 'none' || redisUrl.trim() === '') {
+      this.logger.log('Redis is disabled or REDIS_URL is not set. Operating in pure database-backed mode.');
+      this.client = null;
+      return;
+    }
 
-    this.client.on('error', (err) => {
-      this.logger.error(`Redis connection error: ${err.message}`);
-    });
+    try {
+      this.client = new Redis(redisUrl, {
+        maxRetriesPerRequest: 2,
+        retryStrategy: (times) => {
+          if (times > 3) {
+            return null; // Stop retrying after 3 attempts if Redis is down
+          }
+          return Math.min(times * 200, 1000);
+        },
+        lazyConnect: true,
+        connectTimeout: 3000,
+        enableOfflineQueue: false,
+      });
+
+      this.client.on('connect', () => {
+        this.logger.log('Connected to Redis server');
+      });
+
+      this.client.on('error', (err) => {
+        this.logger.debug(`Redis connection notice: ${err.message}`);
+      });
+
+      this.client.connect().catch((err) => {
+        this.logger.warn(`Redis initial connect failed: ${err.message}. Fallback to database concurrency active.`);
+      });
+    } catch (err: unknown) {
+      this.client = null;
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Redis initialization skipped: ${errorMsg}`);
+    }
   }
 
   onModuleDestroy() {
-    this.client.disconnect();
+    if (this.client) {
+      try {
+        this.client.disconnect();
+      } catch {
+        // Safe tear down
+      }
+    }
   }
 
-  getClient(): Redis {
+  getClient(): Redis | null {
     return this.client;
+  }
+
+  isAvailable(): boolean {
+    return Boolean(this.client);
   }
 
   /**
    * Acquire a distributed lock with TTL (in milliseconds)
    * Locking Strategy:
-   * 1. Uses SET key token NX PX ttlMs to atomically acquire exclusive lock if not already set.
-   * 2. Returns a unique lockIdentifier (nonce) needed to release the lock.
-   * 3. Prevents stale locks via auto-expiration TTL.
+   * 1. If Redis is available: Uses SET key token NX PX ttlMs for atomic exclusive lock.
+   * 2. If Redis is unavailable/disabled: Returns a fallback identifier. Prisma $transaction
+   *    with atomic row-level conditional updates provides ACID concurrency safety.
    */
   async acquireLock(key: string, ttlMs = 10000): Promise<string | null> {
+    if (!this.client) {
+      return `db-lock-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    }
+
     try {
       const lockIdentifier = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       const lockKey = `lock:${key}`;
@@ -56,10 +95,12 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Release a distributed lock safely using Lua script (atomic check-and-delete)
-   * Ensures that a process only releases its own lock and never deletes a lock
-   * acquired by another process after TTL expiration.
    */
   async releaseLock(key: string, identifier: string): Promise<boolean> {
+    if (!this.client || identifier.startsWith('db-lock-')) {
+      return true;
+    }
+
     try {
       const lockKey = `lock:${key}`;
       const luaScript = `
@@ -83,6 +124,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
    * Check if a distributed lock is currently held
    */
   async isLocked(key: string): Promise<boolean> {
+    if (!this.client) {
+      return false;
+    }
+
     try {
       const lockKey = `lock:${key}`;
       const val = await this.client.get(lockKey);
@@ -95,6 +140,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async get(key: string): Promise<string | null> {
+    if (!this.client) {
+      return null;
+    }
+
     try {
       return await this.client.get(key);
     } catch (err: unknown) {
@@ -105,6 +154,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async set(key: string, value: string, ttlSeconds?: number): Promise<'OK' | null> {
+    if (!this.client) {
+      return null;
+    }
+
     try {
       if (ttlSeconds) {
         return await this.client.set(key, value, 'EX', ttlSeconds);
@@ -118,12 +171,30 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async del(key: string): Promise<number> {
+    if (!this.client) {
+      return 0;
+    }
+
     try {
       return await this.client.del(key);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       this.logger.error(`Redis DEL error for key "${key}": ${errorMsg}`);
       return 0;
+    }
+  }
+
+  async ttl(key: string): Promise<number> {
+    if (!this.client) {
+      return -2;
+    }
+
+    try {
+      return await this.client.ttl(key);
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      this.logger.error(`Redis TTL error for key "${key}": ${errorMsg}`);
+      return -2;
     }
   }
 }

@@ -1,19 +1,20 @@
 {
   "name": "booknowshisha-monorepo",
   "version": "1.0.0",
-  "description": "Premium E-commerce + Hookah Rental Platform Monorepo",
+  "description": "Premium E-commerce + Hookah Rental Platform Monorepo (cPanel MySQL Compatible)",
   "private": true,
   "scripts": {
+    "build": "npm run build --prefix backend",
+    "start": "node app.js",
+    "start:prod": "node app.js",
     "backend:dev": "npm run start:dev --prefix backend",
     "backend:build": "npm run build --prefix backend",
     "backend:test": "npm run test --prefix backend",
     "backend:lint": "npm run lint --prefix backend",
     "prisma:generate": "npm run prisma:generate --prefix backend",
     "prisma:migrate": "npm run prisma:migrate --prefix backend",
-    "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f",
-    "docker:build": "docker compose build"
+    "prisma:seed": "npm run prisma:seed --prefix backend",
+    "migrate:data": "npm run migrate:data --prefix backend"
   },
   "keywords": [
     "hookah",
@@ -22,8 +23,8 @@
     "woocommerce",
     "nestjs",
     "prisma",
-    "postgresql",
-    "redis"
+    "mysql",
+    "cpanel"
   ],
   "author": "BookNowShisha Team",
   "license": "UNLICENSED"
