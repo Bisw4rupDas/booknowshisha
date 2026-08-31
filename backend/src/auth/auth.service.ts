@@ -365,7 +365,7 @@ export class AuthService {
       await this.prisma.otpVerification.delete({ where: { phone } }).catch(() => {});
     }
 
-    // Find or create customer in PostgreSQL
+    // Find or create customer in database
     const formattedPhone = `+91${phone}`;
     let user = await this.prisma.user.findFirst({
       where: {
