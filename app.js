@@ -14,7 +14,27 @@
 const path = require('path');
 const fs = require('fs');
 
-// Ensure production environment defaults if not explicitly passed by cPanel
+// Automatically load environment files if present
+try {
+  const dotenvPaths = [
+    path.resolve(__dirname, 'backend', '.env'),
+    path.resolve(__dirname, '.env'),
+  ];
+  for (const envPath of dotenvPaths) {
+    if (fs.existsSync(envPath)) {
+      try {
+        const dotenv = require('dotenv');
+        dotenv.config({ path: envPath });
+      } catch (e) {
+        // dotenv will be loaded by NestJS ConfigModule
+      }
+    }
+  }
+} catch (err) {
+  // Safe fallback
+}
+
+// Ensure production environment default if not explicitly passed by cPanel
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'production';
 }

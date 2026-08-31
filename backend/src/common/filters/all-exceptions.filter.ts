@@ -24,7 +24,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       status = exception.getStatus();
       message = exception.getResponse();
     } else if (exception instanceof Error) {
-      message = exception.message;
+      const isProduction = process.env.NODE_ENV === 'production';
+      message = isProduction ? 'Internal server error. Please try again or contact support.' : exception.message;
     }
 
     const errorResponse = {

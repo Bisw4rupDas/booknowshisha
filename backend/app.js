@@ -8,6 +8,21 @@
 const path = require('path');
 const fs = require('fs');
 
+// Automatically load environment files if present
+try {
+  const envPath = path.resolve(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    try {
+      const dotenv = require('dotenv');
+      dotenv.config({ path: envPath });
+    } catch (e) {
+      // dotenv will be loaded by NestJS ConfigModule
+    }
+  }
+} catch (err) {
+  // Safe fallback
+}
+
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'production';
 }

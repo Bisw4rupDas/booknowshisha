@@ -12,17 +12,23 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT', 3000);
+  const port = process.env.PORT || configService.get<string | number>('PORT', 3000);
   const apiPrefix = configService.get<string>('API_PREFIX', 'api');
 
   // Security Headers
   app.use(helmet());
 
-  // Enable CORS
+  // Dynamic CORS Configuration
+  const corsOriginsRaw = configService.get<string>('CORS_ORIGINS');
+  const allowedOrigins = corsOriginsRaw && corsOriginsRaw.trim() !== '*'
+    ? corsOriginsRaw.split(',').map((o) => o.trim()).filter(Boolean)
+    : true;
+
   app.enableCors({
-    origin: true,
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'X-Core-Secret'],
   });
 
   // Global Prefix
@@ -61,9 +67,9 @@ async function bootstrap() {
 
   await app.listen(port);
   logger.log(`====================================================`);
-  logger.log(`🚀 ShishaRent API running on: http://localhost:${port}/${apiPrefix}`);
-  logger.log(`📚 Swagger Documentation: http://localhost:${port}/${apiPrefix}/docs`);
-  logger.log(`❤️  Health Check: http://localhost:${port}/${apiPrefix}/health`);
+  logger.log(`🚀 ShishaRent API running on port/socket: ${port} (prefix: /${apiPrefix})`);
+  logger.log(`📚 Swagger Documentation: /${apiPrefix}/docs`);
+  logger.log(`❤️  Health Check: /${apiPrefix}/health`);
   logger.log(`====================================================`);
 }
 
